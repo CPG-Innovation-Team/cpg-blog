@@ -2,7 +2,7 @@ package oauth
 
 import (
 	"cpg-blog/global/common"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
 	"time"
 )
