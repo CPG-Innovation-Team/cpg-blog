@@ -1,0 +1,56 @@
+# 域名
+domain = "http://localhost:2020"
+name = "cpg-blog"
+
+# env: dev\test\prod
+env = "dev"
+
+# 网站描述
+[desc]
+keywords = "blog"
+desc = "balabala"
+
+# 存储配置
+[storage]
+driver = "mysql"
+user = "root"
+password = "chenXI951026."
+host = "localhost"
+port = 3306
+dbname = "cpg"
+charset = "utf8mb4"
+# 最大闲置链接数
+max_idle = 2
+# 最大链接数
+max_conn = 10
+# 前缀
+prefix = "cpg_blog_"
+
+# 监听端口
+[http]
+host = ""
+port = ":8080"
+
+[uuid]
+#sn转换进制，默认32
+base = 32
+
+[log]
+# 是否控制台输出日志
+isStdout = true
+
+[gormLog]
+# 慢sql阈值（秒）
+slowThreshold = 2
+# sql日志级别	Silent = 1, Error = 2, Warn = 3, Info = 4
+logLevel = 4
+
+[token]
+# token签名密钥
+signKey = "xichen.ethan"
+# 过期时长,小时为单位
+expires = 1
+# 颁发者
+issuer = "CPG"
+# token主题
+subject = "cpg-blog-token"

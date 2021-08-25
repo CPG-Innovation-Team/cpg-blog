@@ -1,0 +1,4 @@
+[GIN] 2021/08/25 - 18:53:57 | 200 |            0s |             ::1 | POST     "/admin/user/query/info"
+[GIN] 2021/08/25 - 18:54:37 | 200 |            0s |             ::1 | POST     "/admin/user/query/info"
+[GIN] 2021/08/25 - 18:54:49 | 200 |      3.8901ms |             ::1 | POST     "/login"
+[GIN] 2021/08/25 - 18:55:02 | 200 |            0s |             ::1 | POST     "/admin/user/query/info"
