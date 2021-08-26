@@ -2,7 +2,7 @@ package service
 
 import "github.com/gin-gonic/gin"
 
-type User interface {
+type IUser interface {
 	// Login 登录接口
 	Login(ctx *gin.Context)
 
