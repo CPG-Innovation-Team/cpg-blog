@@ -31,7 +31,7 @@ func genToken(info tokenInfo) (token string, err error){
 
 	// 构造用户claims信息(负荷)
 	// 过期时间
-	expiredTime := time.Now().Add(time.Duration(viper.GetInt("expired")) * time.Hour)
+	expiredTime := time.Now().Add(time.Duration(viper.GetInt("token.expires")) * time.Hour)
 	claims := oauth.CustomClaims{
 		Uid:   strconv.Itoa(info.uid),
 		Name:  info.name,
@@ -39,9 +39,9 @@ func genToken(info tokenInfo) (token string, err error){
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiredTime.Unix(),         // 过期时间
 			IssuedAt:  time.Now().Unix(),          // 颁发时间
-			Issuer:    viper.GetString("issuer"),  // 颁发者
+			Issuer:    viper.GetString("token.issuer"),  // 颁发者
 			NotBefore: time.Now().Unix(),          // 生效时间
-			Subject:   viper.GetString("subject"), // token主题
+			Subject:   viper.GetString("token.subject"), // token主题
 		},
 	}
 	token, err = j.CreateToken(claims)

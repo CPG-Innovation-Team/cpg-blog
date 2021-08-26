@@ -1,7 +1,5 @@
 package qo
 
-// TODO 密码加解密
-
 // LoginQO 登录请求参数
 type LoginQO struct {
 	Username string `json:"username" binding:"required"`
