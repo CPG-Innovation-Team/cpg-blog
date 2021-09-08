@@ -15,7 +15,7 @@ type User struct {
 	Gender    uint8
 	Introduce string
 	State     uint8
-	IsRoot    bool `gorm:"column:is_root"`
+	IsRoot    int `gorm:"column:is_root"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

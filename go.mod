@@ -3,8 +3,10 @@ module cpg-blog
 go 1.16
 
 require (
+	github.com/casbin/casbin/v2 v2.36.2
+	github.com/casbin/gorm-adapter/v3 v3.3.3
 	github.com/gin-gonic/gin v1.7.3
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jinzhu/copier v0.3.2
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/spf13/viper v1.8.1

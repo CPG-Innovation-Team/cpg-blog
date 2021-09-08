@@ -2,6 +2,7 @@ package controller
 
 import (
 	"cpg-blog/internal/controller/article"
+	"cpg-blog/internal/controller/auth"
 	"cpg-blog/internal/controller/user"
 	"github.com/gin-gonic/gin"
 )
@@ -23,4 +24,5 @@ type IRegisterRoute interface {
 func RegisterRoutes(g *gin.RouterGroup) {
 	IRegisterRoute.RegisterRoute(new(user.Controller), g)
 	IRegisterRoute.RegisterRoute(new(article.Controller), g)
+	IRegisterRoute.RegisterRoute(new(auth.Controller), g)
 }
