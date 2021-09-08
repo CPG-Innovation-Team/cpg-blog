@@ -9,6 +9,6 @@ func JsonConvert(ctx *gin.Context, obj interface{}) {
 	err := ctx.ShouldBindJSON(obj)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
-		return
+		panic(common.ErrBind)
 	}
 }

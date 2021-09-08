@@ -4,7 +4,6 @@ import (
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/controller"
 	"cpg-blog/middleware"
-	"cpg-blog/middleware/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
@@ -29,7 +28,6 @@ func init() {
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-
 	// header
 	r.Use(middleware.NoCache)
 	r.Use(middleware.Secure)
@@ -41,11 +39,11 @@ func main() {
 	special := r.Group("")
 	controller.RegisterSpecialRoutes(special)
 	adminGroup := r.Group("/admin")
-	adminGroup.Use(jwt.JwtAuth)
+	adminGroup.Use(middleware.JwtAuth)
+	adminGroup.Use(middleware.PermissionAuth)
 	controller.RegisterRoutes(adminGroup)
 
 	//TODO 获取CA证书，并自动更新
-
 	s := &http.Server{
 		Addr:           viper.GetString("http.port"),
 		Handler:        r,

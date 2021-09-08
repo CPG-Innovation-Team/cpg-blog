@@ -20,11 +20,15 @@ var (
 	ErrValidation = &Errno{Code: 20001, Message: "Validation failed."}
 	ErrDatabase   = &Errno{Code: 20002, Message: "Database error."}
 	ErrEncryption = &Errno{Code: 20003, Message: "encryption error"}
+	ErrLoadPolicy = &Errno{Code: 20004, Message: "load policy error"}
 
 	/*
 		person errors
 	*/
-	ErrUserNotFound      = &Errno{Code: 20101, Message: "The user was not found."}
-	ErrPasswordIncorrect = &Errno{Code: 20102, Message: "The password was incorrect."}
-	ErrUserExisted       = &Errno{Code: 20103, Message: "The user was existed."}
+	ErrUserNotFound         = &Errno{Code: 20101, Message: "The user was not found."}
+	ErrPasswordIncorrect    = &Errno{Code: 20102, Message: "The password was incorrect."}
+	ErrUserExisted          = &Errno{Code: 20103, Message: "The user was existed."}
+	ErrArticleNotExisted    = &Errno{Code: 20104, Message: "The Article was not existed."}
+	ErrPermissionNotExisted = &Errno{Code: 20105, Message: "The Permission was not existed."}
+	ErrAccessDenied         = &Errno{Code: 20106, Message: "Access denied."}
 )

@@ -6,7 +6,8 @@ import (
 	"cpg-blog/internal/article/model/dao"
 	"cpg-blog/internal/article/qo"
 	"cpg-blog/internal/article/vo"
-	"cpg-blog/internal/oauth"
+	"cpg-blog/internal/user/service/impl"
+	"cpg-blog/middleware/jwt"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -15,8 +16,74 @@ import (
 
 type Article struct{}
 
-func (a Article) Info(ctx *gin.Context) {
+//文章状态
+const (
+	unreviewed int = iota
+	published
+	removed
+	deleted
+)
 
+var userService = &impl.Users{}
+
+// Info 根据sn查询
+func (a Article) Info(ctx *gin.Context) {
+	infoQO := new(qo.ArticleInfoQO)
+	util.JsonConvert(ctx, infoQO)
+	article := new(model.Article)
+
+	if err := copier.Copy(article, infoQO); err != nil {
+		common.SendResponse(ctx, common.ErrBind, err.Error())
+	}
+	article = new(dao.ArticleDAO).SelectBySn(ctx, article)
+
+	if article.Aid == 0 {
+		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
+	} else if article.State != published {
+		common.SendResponse(ctx, common.OK, "当前文章已下线或已删除！")
+	} else {
+		articleVO := vo.ArticleInfoVO{}
+		if err := copier.Copy(&articleVO, article); err != nil {
+			common.SendResponse(ctx, common.ErrBind, err.Error())
+		}
+		userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
+		articleVO.Author = userMap[uint(article.Uid)].UserName
+		articleVO.CreateAt = article.CreatedAt.Unix()
+		articleVO.UpdatedAt = article.UpdatedAt.Unix()
+		common.SendResponse(ctx, common.OK, articleVO)
+	}
+}
+
+func (a Article) List(ctx *gin.Context) {
+	listQuery := new(qo.ArticleListQO)
+	util.JsonConvert(ctx, listQuery)
+	articleDAO := dao.ArticleDAO{}
+	copier.Copy(articleDAO, listQuery)
+
+	//是否查询自身的所有文章
+	if listQuery.IsAllMyselfArticles {
+		token, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+		if err != nil {
+			common.SendResponse(ctx, err, "")
+			return
+		}
+		articleDAO.Uid, err = strconv.Atoi(token.Uid)
+		articleVO := articleDAO.FindArticles(ctx)
+
+		//通过uid查询名称并填充
+		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
+		for _, v := range articleVO.ArticleDetailList {
+			v.Author = userMap[uint(articleDAO.Uid)].UserName
+		}
+		common.SendResponse(ctx,common.OK,articleVO)
+		return
+	}
+	articleVO := articleDAO.FindArticles(ctx)
+	for _,v := range articleVO.ArticleDetailList{
+		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
+		v.Author = userMap[v.Uid].UserName
+	}
+	common.SendResponse(ctx,common.OK,articleVO)
 }
 
 func (a Article) Add(ctx *gin.Context) {
@@ -28,7 +95,7 @@ func (a Article) Add(ctx *gin.Context) {
 		return
 	}
 	//用户UID从token中解析
-	token, err := oauth.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+	token, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 	article.Uid, err = strconv.Atoi(token.Uid)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
@@ -38,8 +105,8 @@ func (a Article) Add(ctx *gin.Context) {
 	//新增文章的state为未审核0
 	article.State = 0
 
-	//TODO 生成sn规则，数据库唯一且不能重复
-	article.Sn = 12334
+	//TODO 生成sn规则，数据库唯一
+	article.Sn = 1233457
 
 	err = new(dao.ArticleDAO).CreatArticle(ctx, article)
 	if err != nil {

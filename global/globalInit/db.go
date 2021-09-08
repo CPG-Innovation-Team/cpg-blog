@@ -42,15 +42,17 @@ func initEngine() error {
 		logger.Config{
 			SlowThreshold:             time.Duration(viper.GetInt("gormLog.slowThreshold")) * time.Second, // 慢 SQL 阈值
 			LogLevel:                  logger.LogLevel(viper.GetInt("gormLog.logLevel")),                  // 日志级别
-			IgnoreRecordNotFoundError: true,                                                       // 忽略ErrRecordNotFound（记录未找到）错误
-			Colorful:                  false,                                                      // 禁用彩色打印
+			IgnoreRecordNotFoundError: true,                                                               // 忽略ErrRecordNotFound（记录未找到）错误
+			Colorful:                  false,                                                              // 禁用彩色打印
 		},
 	)
 	var err error
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		//默认日志
 		// Logger: logger.Default.LogMode(logger.Silent),
-		Logger: newLogger,
+		//默认关闭事务
+		SkipDefaultTransaction: true,
+		Logger:                 newLogger,
 		NamingStrategy: schema.NamingStrategy{
 			//表前缀
 			TablePrefix: viper.GetString("storage.prefix"),
@@ -75,4 +77,14 @@ func initEngine() error {
 	sqlDB.SetMaxOpenConns(maxConn)
 
 	return nil
+}
+
+func Transaction() (tx *gorm.DB) {
+	tx = Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	return tx
 }

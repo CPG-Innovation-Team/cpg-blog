@@ -11,12 +11,15 @@ var article = &impl.Article{}
 
 // RegisterRoute 添加article服务路由
 func (u Controller) RegisterRoute(g *gin.RouterGroup) {
-	query := g.Group("/article/query")
-	update := g.Group("/article/update")
+	articleGroup := g.Group("/article")
 
-	//查询用户文章信息
-	query.POST("/info", article.Info)
+	//查询文章详情
+	articleGroup.POST("/info", article.Info)
+
+	//查询文章列表
+	articleGroup.POST("/list", article.List)
+
 
 	//用户新增文章
-	update.POST("/add", article.Add)
+	articleGroup.POST("/add", article.Add)
 }

@@ -2,11 +2,11 @@ package impl
 
 import (
 	"cpg-blog/global/common"
-	"cpg-blog/internal/oauth"
 	"cpg-blog/internal/user/model"
 	"cpg-blog/internal/user/model/dao"
 	"cpg-blog/internal/user/qo"
 	"cpg-blog/internal/user/vo"
+	jwt2 "cpg-blog/middleware/jwt"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -23,24 +23,26 @@ type tokenInfo struct {
 	uid   int
 	name  string
 	email string
+	root int
 }
 
 // 生成token
-func genToken(info tokenInfo) (token string, err error){
-	j := oauth.NewJWT()
+func genToken(info tokenInfo) (token string, err error) {
+	j := jwt2.NewJWT()
 
 	// 构造用户claims信息(负荷)
 	// 过期时间
 	expiredTime := time.Now().Add(time.Duration(viper.GetInt("token.expires")) * time.Hour)
-	claims := oauth.CustomClaims{
+	claims := jwt2.CustomClaims{
 		Uid:   strconv.Itoa(info.uid),
 		Name:  info.name,
 		Email: info.email,
+		Root: info.root,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiredTime.Unix(),         // 过期时间
-			IssuedAt:  time.Now().Unix(),          // 颁发时间
+			ExpiresAt: expiredTime.Unix(),               // 过期时间
+			IssuedAt:  time.Now().Unix(),                // 颁发时间
 			Issuer:    viper.GetString("token.issuer"),  // 颁发者
-			NotBefore: time.Now().Unix(),          // 生效时间
+			NotBefore: time.Now().Unix(),                // 生效时间
 			Subject:   viper.GetString("token.subject"), // token主题
 		},
 	}
@@ -62,6 +64,21 @@ func (u Users) decryption(storePasswd, passwd string) (err error) {
 	return bcrypt.CompareHashAndPassword([]byte(storePasswd), []byte(passwd))
 }
 
+// FindUser 根据条件查询用户
+func (u Users) FindUser(ctx *gin.Context, uidList []int, name string, email string) (users map[uint]model.User) {
+	findQO := &dao.UserDAO{
+		UId:   uidList,
+		Name:  name,
+		Email: email,
+	}
+	userList := findQO.GetUser(ctx)
+	users = map[uint]model.User{}
+	for _,v := range *userList{
+		users[v.UID] = v
+	}
+	return users
+}
+
 func (u *Users) Login(ctx *gin.Context) {
 	loginQo := qo.LoginQO{}
 	util.JsonConvert(ctx, &loginQo)
@@ -78,9 +95,10 @@ func (u *Users) Login(ctx *gin.Context) {
 		int(users[0].UID),
 		users[0].UserName,
 		users[0].Email,
+		users[0].IsRoot,
 	}
 	token, err := genToken(tokenInfo)
-	if err!= nil{
+	if err != nil {
 		common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
 	}
 	loginVo := vo.LoginVo{
@@ -122,10 +140,11 @@ func (u Users) Register(ctx *gin.Context) {
 			int(user1[0].UID),
 			user1[0].UserName,
 			user1[0].Email,
+			user1[0].IsRoot,
 		}
 		token, err := genToken(tokenInfo)
 
-		if err!= nil{
+		if err != nil {
 			common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
 		}
 		loginVo := vo.LoginVo{
@@ -149,7 +168,7 @@ func (u Users) Info(ctx *gin.Context) {
 	} else {
 		user = new(dao.UserDAO).SelectByEmail(ctx, infoQO.Email)
 	}
-	common.SendResponse(ctx, common.OK, user)
+	common.SendResponse(ctx, common.OK, user[0])
 }
 
 func (u Users) Modify(ctx *gin.Context) {
