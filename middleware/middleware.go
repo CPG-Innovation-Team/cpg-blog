@@ -89,7 +89,7 @@ func PermissionAuth(ctx *gin.Context) {
 	}
 	//TODO 先从redis查询是否存在对应的权限记录
 
-	result, err := e.Enforce(uid, path, cpgConst.Operate)
+	result, err := e.Enforce(cpgConst.UserPrefix+uid, path, cpgConst.Operate)
 
 	//TODO 如果result == false，需要将user的权限查询记录存入redis
 
