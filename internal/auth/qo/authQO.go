@@ -1,11 +1,8 @@
 package qo
 
-import "cpg-blog/global/cpgConst"
-
 type PermissionQO struct {
-	Name    string `json:"name"`
-	Uri     string `json:"uri"`
-	Operate string `json:"-"`
+	PName string `json:"PName"`
+	Uri   string `json:"uri"`
 }
 
 type AddGroupQO struct {
@@ -20,8 +17,4 @@ type GroupAddPermissionQO struct {
 type AddUserIntoRoleQO struct {
 	Uid   int    `json:"uid"`
 	RName string `json:"RName"` //role name
-}
-
-func GetNewPermission() (p PermissionQO) {
-	return PermissionQO{Operate: cpgConst.Operate}
 }
