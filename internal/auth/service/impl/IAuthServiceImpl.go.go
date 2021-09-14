@@ -22,11 +22,11 @@ func sliceToMap(s [][]string) map[string][]string {
 	}
 	if len(s[0]) == 2 {
 		for _, v := range s {
-			sv, ok := m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)]
-			if ok {
-				sv = append(sv, v[0])
+			_, ok := m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)]
+			if !ok {
+				m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)] = []string{}
 			}
-			m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)] = []string{v[0]}
+
 		}
 	} else if len(s[0]) == 3 {
 		for _, v := range s {
@@ -39,61 +39,63 @@ func sliceToMap(s [][]string) map[string][]string {
 // AllPolicies 查询所有权限
 func (a Auth) AllPolicies(ctx *gin.Context) {
 	e, _ := auth.GetE(ctx)
-	policies := e.GetAllRoles()
-	common.SendResponse(ctx, common.OK, policies)
+	permission := e.GetNamedGroupingPolicy("g2")
+	log.Println(permission)
+	permissionMap := map[string]string{}
+	for _, v := range permission {
+		_, ok := permissionMap[v[1]]
+		if !ok {
+			permissionMap[v[1]] = v[0]
+		}
+	}
+	common.SendResponse(ctx, common.OK, permissionMap)
 }
 
 // AllRoles 查询所有角色及其权限
 func (a Auth) AllRoles(ctx *gin.Context) {
 	e, _ := auth.GetE(ctx)
-	roleAndPermission := make(map[string]map[string]string)
 
-	//角色-权限关系
-	roleAndPermissionRelationship := sliceToMap(e.GetNamedGroupingPolicy("g2"))
+	//角色
+	role:=e.GetNamedGroupingPolicy("g")
+	roleMap := map[string][]string{}
+	for _, v := range role {
+		_, ok := roleMap[strings.TrimPrefix(v[1], cpgConst.RolePrefix)]
+		if !ok {
+			roleMap[strings.TrimPrefix(v[1], cpgConst.RolePrefix)] = []string{}
+		}
+	}
+	log.Println("角色map:",roleMap)
 
 	//权限
-	permission := sliceToMap(e.GetNamedPolicy("p"))
-
-	for _,v:= range roleAndPermissionRelationship{
-		for _, v1:=range v{
-			v1 = permission[v1][0]
+	permission := e.GetNamedGroupingPolicy("g2")
+	permissionMap := map[string]string{}
+	for _, v := range permission {
+		_, ok := permissionMap[v[1]]
+		if !ok {
+			permissionMap[v[1]] = v[0]
 		}
 	}
+	log.Println("权限map:",permissionMap)
 
-	//角色继承关系
-	inheritanceRelationship := e.GetNamedGroupingPolicy("g")
-	for _, v := range inheritanceRelationship {
-		//存在继承关系
-		if strings.Contains(v[0], cpgConst.RolePrefix) {
-
-		}
-	}
-
-	//enforce, err := e.GetImplicitUsersForPermission("权限1")
-	//if err != nil {
-	//	return
-	//}
-	log.Println(inheritanceRelationship)
-	log.Println(roleAndPermissionRelationship)
-	log.Println(permission)
-
+	//角色-权限表关系
+	roleAndPermission:=e.GetPolicy()
 	log.Println(roleAndPermission)
-	//var groups map[string]string
-	//for _,v:=range group{
-	//	if strings.Contains(v[0],"group::"){
-	//		groups = append(groups,v[0])
-	//	}
-	//}
-	common.SendResponse(ctx, common.OK, e.GetNamedGroupingPolicy("g"))
+	for _,v:=range roleAndPermission{
+		rName := strings.TrimPrefix(v[0], cpgConst.RolePrefix)
+		roleMap[rName]=append(roleMap[rName],permissionMap[v[1]])
+	}
+	log.Println("角色与权限关系map:",roleMap)
+
+	common.SendResponse(ctx, common.OK, roleMap)
 }
 
 // AddPermission 系统添加单个权限
 func (a Auth) AddPermission(ctx *gin.Context) {
-	p := qo.GetNewPermission()
+	p := qo.PermissionQO{}
 	e, _ := auth.GetE(ctx)
 	util.JsonConvert(ctx, &p)
 
-	ok, err := e.AddPolicy(p.Name, p.Uri, p.Operate)
+	ok, err := e.AddNamedGroupingPolicy("g2", p.Uri, p.PName)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
@@ -111,7 +113,7 @@ func (a Auth) AddRole(ctx *gin.Context) {
 	name := new(qo.AddGroupQO)
 	util.JsonConvert(ctx, name)
 	e, _ := auth.GetE(ctx)
-	result, err := e.AddNamedGroupingPolicy("g", cpgConst.RolePrefix+name.RName, cpgConst.AdminRole)
+	result, err := e.AddNamedGroupingPolicy("g", "", cpgConst.RolePrefix+name.RName)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
@@ -130,15 +132,15 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	util.JsonConvert(ctx, gap)
 
 	//校验角色
-	hasGroup := e.GetFilteredNamedGroupingPolicy("g", 0, gap.RName)
+	hasGroup := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+gap.RName)
 	if len(hasGroup) == 0 {
 		common.SendResponse(ctx, common.ErrGroupNotExisted, "")
 		return
 	}
 	//根据PName查询策略字段
-	hasPermission := e.GetFilteredNamedPolicy("p", 0, gap.PName)
+	hasPermission := e.GetFilteredNamedGroupingPolicy("g2", 1, gap.PName)
 	if len(hasPermission) > 0 {
-		hasPolicy, err := e.AddNamedGroupingPolicy("g2", gap.PName, gap.RName)
+		hasPolicy, err := e.AddPolicy(cpgConst.RolePrefix+gap.RName, gap.PName)
 
 		if err != nil {
 			common.SendResponse(ctx, common.ErrDatabase, "添加失败"+err.Error())
