@@ -1,2 +1,0 @@
-[GIN] 2021/09/08 - 18:38:29 | 200 |      5.5009ms |             ::1 | POST     "/login"
-[GIN] 2021/09/08 - 18:38:39 | 200 |     56.6366ms |             ::1 | POST     "/admin/auth/group/add/permission"

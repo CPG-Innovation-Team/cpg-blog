@@ -29,6 +29,9 @@ var (
 	ErrPasswordIncorrect    = &Errno{Code: 20102, Message: "The password was incorrect."}
 	ErrUserExisted          = &Errno{Code: 20103, Message: "The user was existed."}
 	ErrArticleNotExisted    = &Errno{Code: 20104, Message: "The Article was not existed."}
-	ErrPermissionNotExisted = &Errno{Code: 20105, Message: "The Permission was not existed."}
-	ErrAccessDenied         = &Errno{Code: 20106, Message: "Access denied."}
+	ErrRoleExisted         = &Errno{Code: 20105, Message: "The role was existed."}
+	ErrGroupNotExisted      = &Errno{Code: 20106, Message: "The group was not existed."}
+	ErrPermissionNotExisted = &Errno{Code: 20107, Message: "The Permission was not existed."}
+	ErrAccessDenied         = &Errno{Code: 20108, Message: "Access denied."}
+	ErrUserExistedInRole    = &Errno{Code: 20109, Message: "The user already exists in the role"}
 )
