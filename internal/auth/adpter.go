@@ -16,12 +16,12 @@ func GetEnforcer() (e *casbin.Enforcer, err error) {
 	e.EnableLog(true)
 
 	// Save the policy back to DB.
-	defer func(e *casbin.Enforcer) {
-		err := e.SavePolicy()
-		if err != nil {
-			return
-		}
-	}(e)
+	//defer func(e *casbin.Enforcer) {
+	//	err := e.SavePolicy()
+	//	if err != nil {
+	//		return
+	//	}
+	//}(e)
 	if err != nil {
 		return nil, err
 	}

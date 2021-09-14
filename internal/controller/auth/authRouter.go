@@ -13,15 +13,27 @@ var auth = &impl.Auth{}
 func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	authGroup := g.Group("/auth")
 
+	//查询所有权限
+	authGroup.POST("/query/permissions", auth.AllPolicies)
+
+	//查询所有用户组
+	authGroup.POST("/query/roles", auth.AllRoles)
+
 	// AddPermission 系统添加单个权限
 	authGroup.POST("/add/permission", auth.AddPermission)
 
-	// AddGroup 添加用户组
-	authGroup.POST("/add/group", auth.AddGroup)
+	//删除单个权限
 
-	// AddPermissionsForGroup 用户组添加权限
-	authGroup.POST("/group/add/permission", auth.AddPermissionsForGroup)
+	// AddRole 添加角色
+	authGroup.POST("/add/role", auth.AddRole)
+
+	// AddPermissionsForGroup 角色添加权限
+	authGroup.POST("/role/add/permission", auth.AddPermissionsForRole)
 
 	// AddUserIntoGroup 添加用户-用户组关联
-	authGroup.POST("/add/permission", auth.AddUserIntoGroup)
+	authGroup.POST("/group/add/user", auth.AddUserIntoRole)
+
+	//删除用户组
+
+	//用户移除用户组
 }
