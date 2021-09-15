@@ -1,1 +1,1 @@
-[GIN] 2021/09/15 - 10:31:51 | 200 |      7.1863ms |             ::1 | POST     "/register"
+[GIN] 2021/09/15 - 16:25:53 | 200 |     19.9105ms |             ::1 | POST     "/admin/auth/delete/role"

@@ -22,7 +22,8 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	// AddPermission 系统添加单个权限
 	authGroup.POST("/add/permission", auth.AddPermission)
 
-	//删除单个权限
+	//删除单个权限,且解除与角色的关联
+	authGroup.POST("/delete/permission", auth.DeletePermission)
 
 	// AddRole 添加角色
 	authGroup.POST("/add/role", auth.AddRole)
@@ -31,9 +32,11 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	authGroup.POST("/role/add/permission", auth.AddPermissionsForRole)
 
 	// AddUserIntoGroup 添加用户-用户组关联
-	authGroup.POST("/group/add/user", auth.AddUserIntoRole)
+	authGroup.POST("/role/add/user", auth.AddUserIntoRole)
 
-	//删除用户组
+	//删除角色，且解除角色与权限关联
+	authGroup.POST("/delete/role", auth.DeleteRole)
 
 	//用户移除用户组
+	authGroup.POST("/role/remove/user", auth.RoleRemoveUser)
 }
