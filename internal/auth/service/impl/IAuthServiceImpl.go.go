@@ -56,7 +56,7 @@ func (a Auth) AllRoles(ctx *gin.Context) {
 	e, _ := auth.GetE(ctx)
 
 	//角色
-	role:=e.GetNamedGroupingPolicy("g")
+	role := e.GetNamedGroupingPolicy("g")
 	roleMap := map[string][]string{}
 	for _, v := range role {
 		_, ok := roleMap[strings.TrimPrefix(v[1], cpgConst.RolePrefix)]
@@ -64,7 +64,7 @@ func (a Auth) AllRoles(ctx *gin.Context) {
 			roleMap[strings.TrimPrefix(v[1], cpgConst.RolePrefix)] = []string{}
 		}
 	}
-	log.Println("角色map:",roleMap)
+	log.Println("角色map:", roleMap)
 
 	//权限
 	permission := e.GetNamedGroupingPolicy("g2")
@@ -75,16 +75,16 @@ func (a Auth) AllRoles(ctx *gin.Context) {
 			permissionMap[v[1]] = v[0]
 		}
 	}
-	log.Println("权限map:",permissionMap)
+	log.Println("权限map:", permissionMap)
 
 	//角色-权限表关系
-	roleAndPermission:=e.GetPolicy()
+	roleAndPermission := e.GetPolicy()
 	log.Println(roleAndPermission)
-	for _,v:=range roleAndPermission{
+	for _, v := range roleAndPermission {
 		rName := strings.TrimPrefix(v[0], cpgConst.RolePrefix)
-		roleMap[rName]=append(roleMap[rName],permissionMap[v[1]])
+		roleMap[rName] = append(roleMap[rName], permissionMap[v[1]])
 	}
-	log.Println("角色与权限关系map:",roleMap)
+	log.Println("角色与权限关系map:", roleMap)
 
 	common.SendResponse(ctx, common.OK, roleMap)
 }

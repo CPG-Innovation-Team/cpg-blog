@@ -23,7 +23,7 @@ type tokenInfo struct {
 	uid   int
 	name  string
 	email string
-	root int
+	root  int
 }
 
 // 生成token
@@ -37,7 +37,7 @@ func genToken(info tokenInfo) (token string, err error) {
 		Uid:   strconv.Itoa(info.uid),
 		Name:  info.name,
 		Email: info.email,
-		Root: info.root,
+		Root:  info.root,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiredTime.Unix(),               // 过期时间
 			IssuedAt:  time.Now().Unix(),                // 颁发时间
@@ -73,7 +73,7 @@ func (u Users) FindUser(ctx *gin.Context, uidList []int, name string, email stri
 	}
 	userList := findQO.GetUser(ctx)
 	users = map[uint]model.User{}
-	for _,v := range *userList{
+	for _, v := range *userList {
 		users[v.UID] = v
 	}
 	return users
@@ -114,7 +114,7 @@ func (u Users) Register(ctx *gin.Context) {
 	util.JsonConvert(ctx, &registerQO)
 
 	//校验唯一参数username、email
-	users := new(dao.UserDAO).SelectByName(ctx, registerQO.UserName)
+	users := new(dao.UserDAO).SelectByNameAndEmail(ctx, &model.User{UserName: registerQO.UserName, Email: registerQO.Email})
 	if 0 < len(users) {
 		common.SendResponse(ctx, common.ErrUserExisted, "")
 	} else {
