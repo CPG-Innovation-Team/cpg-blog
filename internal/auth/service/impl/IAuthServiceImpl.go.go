@@ -14,28 +14,6 @@ import (
 
 type Auth struct{}
 
-//[][]string转换成map[string][]string
-func sliceToMap(s [][]string) map[string][]string {
-	m := map[string][]string{}
-	if len(s) == 0 {
-		return m
-	}
-	if len(s[0]) == 2 {
-		for _, v := range s {
-			_, ok := m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)]
-			if !ok {
-				m[strings.TrimPrefix(v[1], cpgConst.RolePrefix)] = []string{}
-			}
-
-		}
-	} else if len(s[0]) == 3 {
-		for _, v := range s {
-			m[v[0]] = []string{v[1]}
-		}
-	}
-	return m
-}
-
 // AllPolicies 查询所有权限
 func (a Auth) AllPolicies(ctx *gin.Context) {
 	e, _ := auth.GetE(ctx)
@@ -134,7 +112,7 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	//校验角色
 	hasGroup := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+gap.RName)
 	if len(hasGroup) == 0 {
-		common.SendResponse(ctx, common.ErrGroupNotExisted, "")
+		common.SendResponse(ctx, common.ErrRoleNotExisted, "")
 		return
 	}
 	//根据PName查询策略字段
@@ -171,6 +149,61 @@ func (a Auth) AddUserIntoRole(ctx *gin.Context) {
 	}
 	if !result {
 		common.SendResponse(ctx, common.ErrUserExistedInRole, "")
+		return
+	}
+	common.SendResponse(ctx, common.OK, "")
+}
+
+// DeletePermission 移除权限，且解除权限-角色关联
+func (a Auth) DeletePermission(ctx *gin.Context) {
+	query := new(qo.DeletePermissionQO)
+	util.JsonConvert(ctx, query)
+	e, _ := auth.GetE(ctx)
+	result, err := e.RemoveFilteredNamedGroupingPolicy("g2", 1, query.PName)
+	if err != nil {
+		common.SendResponse(ctx, common.ErrDatabase, err)
+		return
+	}
+	if !result {
+		common.SendResponse(ctx, common.ErrPermissionNotExisted, "")
+		return
+	}
+	_, err = e.RemoveFilteredNamedPolicy("p", 1, query.PName)
+	common.SendResponse(ctx, common.OK, err)
+}
+
+// DeleteRole 删除角色，且解除角色与权限关联及角色与用户关联
+func (a Auth) DeleteRole(ctx *gin.Context) {
+	query := new(qo.DeleteRoleQO)
+	util.JsonConvert(ctx, query)
+	e, _ := auth.GetE(ctx)
+	result, err := e.RemoveFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+query.RName)
+	if !result {
+		common.SendResponse(ctx, common.ErrRoleNotExisted, "")
+		return
+	}
+	if err != nil {
+		common.SendResponse(ctx, common.ErrDatabase, err)
+		return
+	}
+	_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+query.RName)
+	common.SendResponse(ctx, common.OK, "")
+}
+
+// RoleRemoveUser 用户移除角色
+func (a Auth) RoleRemoveUser(ctx *gin.Context) {
+	query := new(qo.DeleteUserRoleQO)
+	util.JsonConvert(ctx, query)
+	e, _ := auth.GetE(ctx)
+	result, err := e.RemoveFilteredNamedGroupingPolicy("g", 0,
+		cpgConst.UserPrefix+strconv.Itoa(query.Uid), cpgConst.RolePrefix+query.RName)
+
+	if !result {
+		common.SendResponse(ctx, common.ErrRelationshipNotExisted, "")
+		return
+	}
+	if err != nil {
+		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
 	}
 	common.SendResponse(ctx, common.OK, "")
