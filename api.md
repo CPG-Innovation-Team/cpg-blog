@@ -202,6 +202,148 @@
                 }]
                 }             
         }
+```
 
+# 查询所有权限
+```
+	uri:/auth/query/permissions
+    query:
+        {}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":
+                {
+                "权限1": "/admin/auth/query/roles",
+                "权限2": "/permission/2",
+                "权限4": "/permission/4"
+                }
+        }
+```
 
+# 查询所有角色
+```
+	uri:/auth/query/roles
+    query:
+        {}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":
+                {
+                    "role1": ["/permission/2", "/admin/auth/query/roles"]
+                }
+        }
+```
+
+# 添加单个权限
+```
+	uri:/auth/add/permission
+    query:
+        {    
+        "pName": "权限4",
+        "uri":"/permission/4"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 删除单个权限
+```
+	uri:/auth/delete/permission
+    query:
+        {    
+        "pName": "权限4"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 新增角色
+```
+	uri:/auth/add/role
+    query:
+        {    
+        "rName": "角色名"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 角色添加权限
+```
+	uri:/auth/role/add/permission
+    query:
+        {
+        "rName": "角色名",
+        "pName": "权限名"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 用户添加角色
+```
+	uri:/auth/role/add/user
+    query:
+        {
+        "rName": "角色名",
+        "uid": 111
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 用户删除角色
+```
+	uri:/auth/role/remove/user
+    query:
+        {
+        "rName": "角色名",
+        "uid": 111
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 删除角色
+```
+	uri:/auth/delete/role
+    query:
+        {
+        "rName": "角色名"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
 

@@ -16,7 +16,7 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	//查询所有权限
 	authGroup.POST("/query/permissions", auth.AllPolicies)
 
-	//查询所有用户组
+	//查询所有角色
 	authGroup.POST("/query/roles", auth.AllRoles)
 
 	// AddPermission 系统添加单个权限
