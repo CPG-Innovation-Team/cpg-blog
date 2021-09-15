@@ -88,7 +88,7 @@ func (a Auth) AddPermission(ctx *gin.Context) {
 
 // AddRole 添加角色
 func (a Auth) AddRole(ctx *gin.Context) {
-	name := new(qo.AddGroupQO)
+	name := new(qo.AddRoleQO)
 	util.JsonConvert(ctx, name)
 	e, _ := auth.GetE(ctx)
 	result, err := e.AddNamedGroupingPolicy("g", "", cpgConst.RolePrefix+name.RName)

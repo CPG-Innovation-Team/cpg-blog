@@ -5,7 +5,7 @@ type PermissionQO struct {
 	Uri   string `json:"uri"`
 }
 
-type AddGroupQO struct {
+type AddRoleQO struct {
 	RName string `json:"rName"` //role name
 }
 
