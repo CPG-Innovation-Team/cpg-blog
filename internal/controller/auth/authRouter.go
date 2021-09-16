@@ -37,6 +37,6 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	//删除角色，且解除角色与权限关联
 	authGroup.POST("/delete/role", auth.DeleteRole)
 
-	//用户移除用户组
+	//用户移除角色
 	authGroup.POST("/role/remove/user", auth.RoleRemoveUser)
 }
