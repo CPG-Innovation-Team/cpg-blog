@@ -1,2 +1,4 @@
-[GIN] 2021/09/17 - 11:01:13 | 200 |     35.1001ms |             ::1 | POST     "/login"
-[GIN] 2021/09/17 - 11:02:01 | 200 |     23.9139ms |             ::1 | POST     "/admin/user/query/list"
+[GIN] 2021/09/17 - 17:17:32 | 200 |      3.5273ms |             ::1 | POST     "/login"
+[GIN] 2021/09/17 - 17:17:52 | 500 |      4.0897ms |             ::1 | POST     "/admin/article/list"
+[GIN] 2021/09/17 - 17:18:00 | 200 |     18.2413ms |             ::1 | POST     "/admin/article/list"
+[GIN] 2021/09/17 - 17:18:11 | 200 |      15.985ms |             ::1 | POST     "/admin/article/list"
