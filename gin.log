@@ -1,2 +1,4 @@
-[GIN] 2021/09/17 - 17:53:47 | 200 |      7.5482ms |             ::1 | POST     "/admin/article/delete"
-[GIN] 2021/09/17 - 17:53:59 | 200 |      8.1249ms |             ::1 | POST     "/admin/article/delete"
+[GIN] 2021/09/17 - 18:25:14 | 200 |     10.2088ms |             ::1 | POST     "/admin/user/query/list"
+[GIN] 2021/09/17 - 18:25:29 | 200 |      5.7849ms |             ::1 | POST     "/admin/user/query/list"
+[GIN] 2021/09/17 - 18:25:33 | 200 |      7.4983ms |             ::1 | POST     "/admin/user/query/list"
+[GIN] 2021/09/17 - 18:25:42 | 200 |      9.6946ms |             ::1 | POST     "/admin/user/query/list"

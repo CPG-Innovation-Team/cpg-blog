@@ -27,6 +27,13 @@ type tokenInfo struct {
 	root  int
 }
 
+//用户状态
+const (
+	one   int = iota + 1 //正常
+	two                  //禁发文
+	there                //冻结
+)
+
 // 生成token
 func genToken(info tokenInfo) (token string, err error) {
 	j := jwt2.NewJWT()
@@ -172,11 +179,19 @@ func (u Users) Info(ctx *gin.Context) {
 	common.SendResponse(ctx, common.OK, user[0])
 }
 
-func (u Users) List(ctx *gin.Context)  {
+func (u Users) List(ctx *gin.Context) {
 	//TODO 分页
 	var users []model.User
-	globalInit.Db.Find(&users)
-	common.SendResponse(ctx, common.OK, users)
+	listQO := qo.UserListQO{}
+	util.JsonConvert(ctx, &listQO)
+	if listQO.State != one && listQO.State != two && listQO.State != there {
+		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	}
+	globalInit.Db.Where("state", listQO.State).Find(&users)
+	var userList []vo.UserListVO
+	copier.Copy(&userList, &users)
+	common.SendResponse(ctx, common.OK, userList)
 }
 
 func (u Users) Modify(ctx *gin.Context) {
