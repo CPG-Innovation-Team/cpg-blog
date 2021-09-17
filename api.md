@@ -72,6 +72,30 @@
         }             
 ```
 
+# 查询用户列表
+```
+	uri:/admin/user/query/list
+    query:{"state":0}//只能为1\2\3 用户状态 1-正常;2-禁发文;3-冻结
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data": [
+            {
+            "UID": 111,
+            "UserName": "chenxi",
+            "Email": "chenxi@qq.com",
+            "Nickname": "",
+            "Avatar": "",
+            "Gender": 0,
+            "Introduce": "",
+            "State": 0,
+            "IsRoot": 1
+            }
+            }
+        }
+```
+
 # 修改用户信息
 ```
 	uri:/admin/user/update/info
@@ -117,6 +141,19 @@
                 }
         }
 ```        
+
+# 删除文章
+```
+	uri:/admin/article/delete
+    query:
+        {"sn": 12334}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":""
+        }
+```
         
 # 查询文章详情
 ```
@@ -199,7 +236,11 @@
                     "viewNum":1,
                     "cmtNum":1,
                     "zanNum":2 
-                }]
+                }],
+            "PageNum": 1,
+            "PageSize": 10,
+            "Total": 15,    //总条数
+            "TotalPage": 2  //总页数
                 }             
         }
 ```
@@ -346,4 +387,3 @@
             "data":{}
         }
 ```
-

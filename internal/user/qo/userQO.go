@@ -120,3 +120,10 @@ type ModifyQO struct {
 	*/
 	IsRoot int `json:"isRoot"`
 }
+
+type UserListQO struct {
+	/*
+		用户状态 1-正常;2-禁发文;3-冻结
+	*/
+	State int `json:"state"`
+}

@@ -13,6 +13,7 @@ var (
 	ErrTokenMalformed   = &Errno{Code: 10006, Message: "That's not even a token."}
 	ErrTokenInvalid     = &Errno{Code: 10007, Message: "Couldn't handle this token:"}
 	ErrGenerateToken    = &Errno{Code: 10008, Message: "Generate Token is wrong."}
+	ErrParam            = &Errno{Code: 10009, Message: "Invalid Param."}
 
 	/*
 		system errors
@@ -25,14 +26,14 @@ var (
 	/*
 		person errors
 	*/
-	ErrUserNotFound         = &Errno{Code: 20101, Message: "The user was not found."}
-	ErrPasswordIncorrect    = &Errno{Code: 20102, Message: "The password was incorrect."}
-	ErrUserExisted          = &Errno{Code: 20103, Message: "The user was existed."}
-	ErrArticleNotExisted    = &Errno{Code: 20104, Message: "The Article was not existed."}
-	ErrRoleExisted          = &Errno{Code: 20105, Message: "The role was existed."}
-	ErrRoleNotExisted       = &Errno{Code: 20106, Message: "The role was not existed."}
-	ErrPermissionNotExisted = &Errno{Code: 20107, Message: "The Permission was not existed."}
-	ErrAccessDenied         = &Errno{Code: 20108, Message: "Access denied."}
-	ErrUserExistedInRole    = &Errno{Code: 20109, Message: "The user already exists in the role."}
+	ErrUserNotFound           = &Errno{Code: 20101, Message: "The user was not found."}
+	ErrPasswordIncorrect      = &Errno{Code: 20102, Message: "The password was incorrect."}
+	ErrUserExisted            = &Errno{Code: 20103, Message: "The user was existed."}
+	ErrArticleNotExisted      = &Errno{Code: 20104, Message: "The Article was not existed."}
+	ErrRoleExisted            = &Errno{Code: 20105, Message: "The role was existed."}
+	ErrRoleNotExisted         = &Errno{Code: 20106, Message: "The role was not existed."}
+	ErrPermissionNotExisted   = &Errno{Code: 20107, Message: "The Permission was not existed."}
+	ErrAccessDenied           = &Errno{Code: 20108, Message: "Access denied."}
+	ErrUserExistedInRole      = &Errno{Code: 20109, Message: "The user already exists in the role."}
 	ErrRelationshipNotExisted = &Errno{Code: 20110, Message: "The relationship does not exist."}
 )
