@@ -2,6 +2,7 @@ package impl
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/article/model"
 	"cpg-blog/internal/article/model/dao"
 	"cpg-blog/internal/article/qo"
@@ -60,7 +61,7 @@ func (a Article) List(ctx *gin.Context) {
 	util.JsonConvert(ctx, listQuery)
 	articleDAO := new(dao.ArticleDAO)
 	copier.Copy(articleDAO, listQuery)
-	copier.Copy(articleDAO,listQuery.Article)
+	copier.Copy(articleDAO, listQuery.Article)
 
 	log.Println("请求参数:", listQuery)
 	log.Println("articleDAO:", articleDAO)
@@ -123,4 +124,21 @@ func (a Article) Add(ctx *gin.Context) {
 	}
 	resp := vo.AddArticleVO{Sn: article.Sn}
 	common.SendResponse(ctx, common.OK, resp)
+}
+
+func (a Article) Delete(ctx *gin.Context) {
+	deleteQO := new(qo.ArticleInfoQO)
+	util.JsonConvert(ctx, deleteQO)
+	var articleList []model.Article
+	tx := globalInit.Db.Where("sn", deleteQO.Sn).Find(&articleList)
+	if len(articleList) == 0 {
+		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
+		return
+	}
+	if articleList[0].State == 1{
+		common.SendResponse(ctx, common.OK, "")
+		return
+	}
+	tx.Update("state", 1).Commit()
+	common.SendResponse(ctx, common.OK, "")
 }
