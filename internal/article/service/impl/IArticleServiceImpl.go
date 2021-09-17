@@ -11,6 +11,7 @@ import (
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"log"
 	"strconv"
 )
 
@@ -57,8 +58,12 @@ func (a Article) Info(ctx *gin.Context) {
 func (a Article) List(ctx *gin.Context) {
 	listQuery := new(qo.ArticleListQO)
 	util.JsonConvert(ctx, listQuery)
-	articleDAO := dao.ArticleDAO{}
+	articleDAO := new(dao.ArticleDAO)
 	copier.Copy(articleDAO, listQuery)
+	copier.Copy(articleDAO,listQuery.Article)
+
+	log.Println("请求参数:", listQuery)
+	log.Println("articleDAO:", articleDAO)
 
 	//是否查询自身的所有文章
 	if listQuery.IsAllMyselfArticles {
@@ -75,15 +80,15 @@ func (a Article) List(ctx *gin.Context) {
 		for _, v := range articleVO.ArticleDetailList {
 			v.Author = userMap[uint(articleDAO.Uid)].UserName
 		}
-		common.SendResponse(ctx,common.OK,articleVO)
+		common.SendResponse(ctx, common.OK, articleVO)
 		return
 	}
 	articleVO := articleDAO.FindArticles(ctx)
-	for _,v := range articleVO.ArticleDetailList{
+	for _, v := range articleVO.ArticleDetailList {
 		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
 		v.Author = userMap[v.Uid].UserName
 	}
-	common.SendResponse(ctx,common.OK,articleVO)
+	common.SendResponse(ctx, common.OK, articleVO)
 }
 
 func (a Article) Add(ctx *gin.Context) {

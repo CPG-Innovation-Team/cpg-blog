@@ -23,6 +23,9 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	//查询用户信息
 	query.POST("/info", user.Info)
 
+	//查询所有用户
+	query.POST("/list", user.List)
+
 	//修改用户信息
 	update.POST("/info", user.Modify)
 }

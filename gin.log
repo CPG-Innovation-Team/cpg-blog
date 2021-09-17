@@ -1,3 +1,2 @@
-[GIN] 2021/09/15 - 16:42:41 | 200 |            0s |             ::1 | POST     "/admin/auth/query/permissions"
-[GIN] 2021/09/15 - 16:42:59 | 200 |      9.3597ms |             ::1 | POST     "/admin/auth/query/permissions"
-[GIN] 2021/09/15 - 16:44:53 | 200 |      8.5473ms |             ::1 | POST     "/admin/auth/query/roles"
+[GIN] 2021/09/17 - 11:01:13 | 200 |     35.1001ms |             ::1 | POST     "/login"
+[GIN] 2021/09/17 - 11:02:01 | 200 |     23.9139ms |             ::1 | POST     "/admin/user/query/list"

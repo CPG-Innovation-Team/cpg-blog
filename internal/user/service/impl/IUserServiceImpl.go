@@ -2,6 +2,7 @@ package impl
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/user/model"
 	"cpg-blog/internal/user/model/dao"
 	"cpg-blog/internal/user/qo"
@@ -169,6 +170,13 @@ func (u Users) Info(ctx *gin.Context) {
 		user = new(dao.UserDAO).SelectByEmail(ctx, infoQO.Email)
 	}
 	common.SendResponse(ctx, common.OK, user[0])
+}
+
+func (u Users) List(ctx *gin.Context)  {
+	//TODO 分页
+	var users []model.User
+	globalInit.Db.Find(&users)
+	common.SendResponse(ctx, common.OK, users)
 }
 
 func (u Users) Modify(ctx *gin.Context) {

@@ -19,7 +19,6 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	//查询文章列表
 	articleGroup.POST("/list", article.List)
 
-
 	//用户新增文章
 	articleGroup.POST("/add", article.Add)
 }
