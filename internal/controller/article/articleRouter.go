@@ -21,4 +21,7 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 
 	//用户新增文章
 	articleGroup.POST("/add", article.Add)
+
+	//删除文章
+	articleGroup.POST("/delete", article.Delete)
 }
