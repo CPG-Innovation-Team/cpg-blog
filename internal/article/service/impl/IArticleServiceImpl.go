@@ -77,16 +77,19 @@ func (a Article) List(ctx *gin.Context) {
 
 		//通过uid查询名称并填充
 		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
-		for _, v := range articleVO.ArticleDetailList {
-			v.Author = userMap[uint(articleDAO.Uid)].UserName
+		articleList := articleVO.ArticleDetailList
+		for k, v := range articleVO.ArticleDetailList {
+			articleList[k].Author = userMap[v.Uid].UserName
+			//v.Author = userMap[uint(articleDAO.Uid)].UserName
 		}
 		common.SendResponse(ctx, common.OK, articleVO)
 		return
 	}
 	articleVO := articleDAO.FindArticles(ctx)
-	for _, v := range articleVO.ArticleDetailList {
-		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
-		v.Author = userMap[v.Uid].UserName
+	articleList := articleVO.ArticleDetailList
+	for k, v := range articleList {
+		userMap := userService.FindUser(ctx, []int{int(v.Uid)}, "", "")
+		articleList[k].Author = userMap[v.Uid].UserName
 	}
 	common.SendResponse(ctx, common.OK, articleVO)
 }
