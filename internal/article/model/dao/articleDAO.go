@@ -8,12 +8,13 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 	"strings"
 )
 
 type ArticleDAO struct {
-	Aid     int
-	Sn      int
+	Aid     int `json:"aid"`
+	Sn      int `json:"sn"`
 	Title   string
 	Uid     int `json:"uid"`
 	Cover   string
@@ -23,7 +24,7 @@ type ArticleDAO struct {
 	ViewNum bool `json:"view_num"`
 	CmtNum  bool `json:"cmt_num"`
 	ZanNum  bool `json:"zan_num"`
-	page    common.PageQO
+	Page    common.PageQO
 }
 
 var Db = &(globalInit.Db)
@@ -59,12 +60,14 @@ func (ad ArticleDAO) SelectBySn(ctx *gin.Context, article *model.Article) *model
 }
 
 func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO) {
-	tx := (*Db).WithContext(ctx)
-	if ad.page.PageNum > 0 && ad.page.PageSize > 0 {
-		tx.Limit(ad.page.PageSize).Offset((ad.page.PageNum - 1) * ad.page.PageSize)
+	tx := (*Db).WithContext(ctx).Model(&model.Article{})
+	if ad.Page.PageNum > 0 && ad.Page.PageSize > 0 {
+		size := ad.Page.PageSize
+		num := ad.Page.PageNum
+		tx = tx.Offset(size * (num - 1)).Limit(size).Order("aid asc")
 	}
-	if strings.Compare(ad.page.Order, "desc") == 0 {
-		tx.Order(ad.page.Order)
+	if strings.Compare(ad.Page.Order, "desc") == 0 {
+		tx = tx.Order("aid" + ad.Page.Order)
 	}
 
 	if ad.Sn != 0 { //sn精确搜索
@@ -94,12 +97,10 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 	if ad.ZanNum {
 		tx = tx.Order("zan_num desc")
 	}
-	pageVO := new(common.PageVO)
-	tx, pageVO = ad.page.NewPageVO(tx)
-	tx.Model(&model.Article{}).Select("cpg_blog_article.aid,sn, title, uid, cover, content, tags, state, view_num, cmt_num, zan_num").
-		Joins("LEFT JOIN cpg_blog_article_ex ON cpg_blog_article.aid = cpg_blog_article_ex.aid ")
+	tx, pageVO := ad.Page.NewPageVO(tx)
 	articlesVO.PageVO = *pageVO
-	row, err := tx.Rows()
+	row, err := tx.Select("cpg_blog_article.aid,sn, title, uid, cover, content, tags, state, view_num, cmt_num, zan_num").
+		Joins("LEFT JOIN cpg_blog_article_ex ON cpg_blog_article.aid = cpg_blog_article_ex.aid ").Rows()
 
 	defer func(row *sql.Rows) {
 		err := row.Close()
@@ -108,6 +109,7 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 		}
 	}(row)
 
+	log.Println(err)
 	if err == nil {
 		for row.Next() {
 			article := &(vo.ArticleDetail{})

@@ -37,24 +37,24 @@ type ArticleInfoQO struct {
 
 type Article struct {
 	/*
-	文章id，关联扩展表aid
-	 */
-	Aid     int
+		文章id，关联扩展表aid
+	*/
+	Aid     int`json:"aid"`
 
 	/*
-	文章sn号
-	 */
-	Sn      int
+		文章sn号
+	*/
+	Sn int
 
 	/*
 		文章标题
 	*/
-	Title   string
+	Title string
 
 	/*
-	作者uid
-	 */
-	Uid     int `json:"uid"`
+		作者uid
+	*/
+	Uid int `json:"uid"`
 
 	/*
 		内容，markdown格式
@@ -64,27 +64,27 @@ type Article struct {
 	/*
 		文章 tag，逗号分隔
 	*/
-	Tags    string
+	Tags string
 
 	/*
-	文章状态 0-未审核;1-已上线;2-下线;3-用户删除'
-	 */
-	State   int
+		文章状态 0-未审核;1-已上线;2-下线;3-用户删除'
+	*/
+	State int
 
 	/*
-	浏览量排序，默认asc
-	 */
+		浏览量排序，默认asc
+	*/
 	ViewNum bool `json:"view_num"`
 
 	/*
-	评论数排序，默认asc
-	 */
-	CmtNum  bool `json:"cmt_num"`
+		评论数排序，默认asc
+	*/
+	CmtNum bool `json:"cmt_num"`
 
 	/*
-	点赞数排序，默认asc
-	 */
-	ZanNum  bool `json:"zan_num"`
+		点赞数排序，默认asc
+	*/
+	ZanNum bool `json:"zan_num"`
 }
 
 // ArticleListQO 根据条件搜索文章
@@ -97,13 +97,10 @@ type ArticleListQO struct {
 	/*
 		通过参数搜索文章
 	*/
-	Article
+	Article Article `form:"article" json:"article"`
 
 	/*
 		分页
 	*/
-	page common.PageQO
+	Page common.PageQO `form:"page" json:"page"`
 }
-
-
-

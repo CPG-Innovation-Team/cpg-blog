@@ -30,7 +30,6 @@ func (pq *PageQO)NewPageVO(db *gorm.DB) (*gorm.DB, *PageVO) {
 		pv.pageNum = pq.PageNum
 		db = db.Limit(pq.PageSize).
 			Offset((pq.PageNum - 1) * pq.PageSize).
-			Order(pq.Order).
 			Count(&(pv.Total))
 		return db, pv
 	}
