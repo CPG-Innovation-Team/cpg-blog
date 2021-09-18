@@ -32,7 +32,7 @@ type ArticleInfoQO struct {
 	/*
 		文章sn号
 	*/
-	Sn int `binding:"required"`
+	Sn int64 `binding:"required"`
 }
 
 type Article struct {
@@ -44,7 +44,7 @@ type Article struct {
 	/*
 		文章sn号
 	*/
-	Sn int
+	Sn int64
 
 	/*
 		文章标题

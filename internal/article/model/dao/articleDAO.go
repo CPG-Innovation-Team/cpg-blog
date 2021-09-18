@@ -14,7 +14,7 @@ import (
 
 type ArticleDAO struct {
 	Aid     int `json:"aid"`
-	Sn      int `json:"sn"`
+	Sn      int64 `json:"sn"`
 	Title   string
 	Uid     int `json:"uid"`
 	Cover   string

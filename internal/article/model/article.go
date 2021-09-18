@@ -4,7 +4,7 @@ import "time"
 
 type Article struct {
 	Aid       int `gorm:"primaryKey; autoIncrement;"`
-	Sn        int
+	Sn        int64
 	Title     string
 	Uid       int `gorm:"column:uid"`
 	Cover     string
