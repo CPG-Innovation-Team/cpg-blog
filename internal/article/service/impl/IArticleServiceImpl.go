@@ -20,9 +20,16 @@ type Article struct{}
 
 //文章状态
 const (
+	//0-未审核
 	unreviewed int = iota
+
+	//1-已上线
 	published
+
+	//2-下线
 	removed
+
+	//3-用户删除
 	deleted
 )
 
@@ -41,19 +48,18 @@ func (a Article) Info(ctx *gin.Context) {
 
 	if article.Aid == 0 {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
-	} else if article.State != published {
-		common.SendResponse(ctx, common.OK, "当前文章已下线或已删除！")
-	} else {
-		articleVO := vo.ArticleInfoVO{}
-		if err := copier.Copy(&articleVO, article); err != nil {
-			common.SendResponse(ctx, common.ErrBind, err.Error())
-		}
-		userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
-		articleVO.Author = userMap[uint(article.Uid)].UserName
-		articleVO.CreateAt = article.CreatedAt.Unix()
-		articleVO.UpdatedAt = article.UpdatedAt.Unix()
-		common.SendResponse(ctx, common.OK, articleVO)
+		return
 	}
+
+	articleVO := vo.ArticleInfoVO{}
+	if err := copier.Copy(&articleVO, article); err != nil {
+		common.SendResponse(ctx, common.ErrBind, err.Error())
+	}
+	userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
+	articleVO.Author = userMap[uint(article.Uid)].UserName
+	articleVO.CreateAt = article.CreatedAt.Unix()
+	articleVO.UpdatedAt = article.UpdatedAt.Unix()
+	common.SendResponse(ctx, common.OK, articleVO)
 }
 
 func (a Article) List(ctx *gin.Context) {
@@ -62,9 +68,6 @@ func (a Article) List(ctx *gin.Context) {
 	articleDAO := new(dao.ArticleDAO)
 	copier.Copy(articleDAO, listQuery)
 	copier.Copy(articleDAO, listQuery.Article)
-
-	//默认查询已审核通过上线的文章
-	articleDAO.State = 1
 
 	log.Println("请求参数:", listQuery)
 	log.Println("articleDAO:", articleDAO)
@@ -114,10 +117,9 @@ func (a Article) Add(ctx *gin.Context) {
 	}
 	article.Uid, _ = strconv.Atoi(token.Uid)
 
-
 	//新增文章的state为未审核1
 	//TODO 后续需要增加审核功能，初始state应为0
-	article.State = 1
+	article.State = published
 
 	article.Sn = common.Snowflake.NextID()
 	log.Println(article.Sn)
@@ -140,10 +142,10 @@ func (a Article) Delete(ctx *gin.Context) {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
 		return
 	}
-	if articleList[0].State == 1{
+	if articleList[0].State == deleted {
 		common.SendResponse(ctx, common.OK, "")
 		return
 	}
-	tx.Update("state", 1).Commit()
+	tx.Update("state", deleted).Commit()
 	common.SendResponse(ctx, common.OK, "")
 }

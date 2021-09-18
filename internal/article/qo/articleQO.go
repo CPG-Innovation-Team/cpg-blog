@@ -69,7 +69,7 @@ type Article struct {
 	/*
 		文章状态 0-未审核;1-已上线;2-下线;3-用户删除'
 	*/
-	State int
+	State int`json:"state"`
 
 	/*
 		浏览量排序，默认asc
