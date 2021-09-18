@@ -63,6 +63,9 @@ func (a Article) List(ctx *gin.Context) {
 	copier.Copy(articleDAO, listQuery)
 	copier.Copy(articleDAO, listQuery.Article)
 
+	//默认查询已审核通过上线的文章
+	articleDAO.State = 1
+
 	log.Println("请求参数:", listQuery)
 	log.Println("articleDAO:", articleDAO)
 
@@ -105,17 +108,19 @@ func (a Article) Add(ctx *gin.Context) {
 	}
 	//用户UID从token中解析
 	token, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
-	article.Uid, err = strconv.Atoi(token.Uid)
 	if err != nil {
-		common.SendResponse(ctx, err, "")
+		common.SendResponse(ctx, common.ErrTokenInvalid, "")
 		return
 	}
+	article.Uid, _ = strconv.Atoi(token.Uid)
 
-	//新增文章的state为未审核0
-	article.State = 0
 
-	//TODO 生成sn规则，数据库唯一
-	article.Sn = 1233457
+	//新增文章的state为未审核1
+	//TODO 后续需要增加审核功能，初始state应为0
+	article.State = 1
+
+	article.Sn = common.Snowflake.NextID()
+	log.Println(article.Sn)
 
 	err = new(dao.ArticleDAO).CreatArticle(ctx, article)
 	if err != nil {

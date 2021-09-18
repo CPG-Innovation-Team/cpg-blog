@@ -4,7 +4,7 @@ import "cpg-blog/global/common"
 
 // AddArticleVO 新增文章返回参数
 type AddArticleVO struct {
-	Sn int
+	Sn int64
 }
 
 // ArticleInfoVO 返回文章详情
@@ -12,7 +12,7 @@ type ArticleInfoVO struct {
 	/*
 		文章sn号
 	*/
-	Sn int
+	Sn int64
 
 	/*
 		文章标题
@@ -59,7 +59,7 @@ type ArticleDetail struct {
 	/*
 		文章sn号
 	*/
-	Sn int
+	Sn int64
 
 	/*
 		文章标题
