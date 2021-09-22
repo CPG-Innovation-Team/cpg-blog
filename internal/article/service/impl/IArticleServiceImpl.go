@@ -149,3 +149,32 @@ func (a Article) Delete(ctx *gin.Context) {
 	tx.Update("state", deleted).Commit()
 	common.SendResponse(ctx, common.OK, "")
 }
+
+func (a Article) Update(ctx *gin.Context) {
+	updateQO := new(qo.UpdateArticleQO)
+	util.JsonConvert(ctx, updateQO)
+	if updateQO.Tags == "" &&
+		updateQO.Title == "" &&
+		updateQO.Content == "" &&
+		updateQO.Cover == "" &&
+		updateQO.State == "" {
+		ok := common.OK
+		ok.Message = "请输入更新内容"
+		common.SendResponse(ctx, ok, "")
+		return
+	}
+	updateDAO := new(dao.ArticleDAO)
+	copier.Copy(updateDAO, updateQO)
+	state,_:= strconv.Atoi(updateQO.State)
+	updateDAO.State= state
+	if state!=unreviewed&&state!=published&&state!=removed&&state!=deleted{
+		common.SendResponse(ctx,common.ErrParam,"")
+		return
+	}
+	err := updateDAO.UpdateArticle(ctx)
+	if err != nil {
+		common.SendResponse(ctx,common.ErrDatabase,err)
+		return
+	}
+	common.SendResponse(ctx,common.OK,"")
+}

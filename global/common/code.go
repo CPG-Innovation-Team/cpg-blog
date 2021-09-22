@@ -4,7 +4,7 @@ var (
 	/*
 		common errors
 	*/
-	OK                  = &Errno{Code: 0, Message: "OK"}
+	OK                  = &Errno{Code: 10000, Message: "OK"}
 	InternalServerError = &Errno{Code: 10001, Message: "Internal server error."}
 	ErrBind             = &Errno{Code: 10002, Message: "Error occurred while binding the request body to the struct."}
 	ErrToken            = &Errno{Code: 10003, Message: "Invalid Token."}

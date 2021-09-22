@@ -39,7 +39,7 @@ type Article struct {
 	/*
 		文章id，关联扩展表aid
 	*/
-	Aid     int`json:"aid"`
+	Aid int `json:"aid"`
 
 	/*
 		文章sn号
@@ -69,7 +69,7 @@ type Article struct {
 	/*
 		文章状态 0-未审核;1-已上线;2-下线;3-用户删除'
 	*/
-	State int`json:"state"`
+	State int `json:"state"`
 
 	/*
 		浏览量排序，默认asc
@@ -103,4 +103,36 @@ type ArticleListQO struct {
 		分页
 	*/
 	Page common.PageQO `form:"page" json:"page"`
+}
+
+// UpdateArticleQO 更新文章
+type UpdateArticleQO struct {
+	/*
+		文章id，关联扩展表aid
+	*/
+	Aid int `json:"aid" binding:"required"`
+	/*
+		文章标题
+	*/
+	Title string
+
+	/*
+		文章封面图地址
+	*/
+	Cover string
+
+	/*
+		内容，markdown格式
+	*/
+	Content string
+
+	/*
+		文章 tag，逗号分隔
+	*/
+	Tags string
+
+	/*
+		文章状态 0-未审核;1-已上线;2-下线;3-用户删除 必传参数
+	*/
+	State string `json:"state" binding:"required"`
 }

@@ -11,4 +11,10 @@ type IArticle interface {
 
 	// Add 新增文章
 	Add(ctx *gin.Context)
+
+	// Delete 删除文章
+	Delete(ctx *gin.Context)
+
+	// Update 更新文章
+	Update(ctx *gin.Context)
 }

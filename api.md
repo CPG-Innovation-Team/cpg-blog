@@ -154,6 +154,26 @@
             "data":""
         }
 ```
+
+# 更新文章
+```
+	uri:/admin/article/update
+    query:
+        {
+            "aid":1, //必传
+            "title": "update22",
+            "cover": "update22",
+            "content": "update222",
+            "tags": "update222",
+            "state":"" //必传，且不能为空
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":""
+        }
+```
         
 # 查询文章详情
 ```
