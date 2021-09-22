@@ -18,6 +18,9 @@ type IUser interface {
 	// Info 前端请求查询用户信息
 	Info(ctx *gin.Context)
 
+	// List 查询用户list
+	List(ctx *gin.Context)
+
 	//Modify 修改用户信息
 	Modify(ctx *gin.Context)
 }

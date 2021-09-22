@@ -126,3 +126,19 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 func (ad ArticleDAO) FindArticleEx() {
 
 }
+
+func (ad ArticleDAO) UpdateArticle(ctx *gin.Context) (err error) {
+	tx := globalInit.Transaction().Model(&model.Article{}).Where("aid", ad.Aid)
+	err = func(db *gorm.DB) error {
+		if tx.Error != nil {
+			return tx.Error
+		}
+		tx.Omit("aid","sn","uid").Update("state",ad.State).Updates(ad)
+		if tx.Error != nil {
+			tx.Rollback()
+			return tx.Error
+		}
+		return tx.Commit().Error
+	}(tx)
+	return err
+}

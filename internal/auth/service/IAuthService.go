@@ -6,18 +6,27 @@ type IAuth interface {
 	// AllPolicies 查询所有权限
 	AllPolicies(ctx *gin.Context)
 
-	// AllGroups 查询所有用户组
+	// AllRoles 查询所有角色及其权限
 	AllRoles(ctx *gin.Context)
 
 	// AddPermission 系统添加单个权限
 	AddPermission(ctx *gin.Context)
 
-	// AddGroup 添加用户组
+	// AddRole 添加角色
 	AddRole(ctx *gin.Context)
 
-	// AddPermissionsForGroup 用户组添加权限
-	AddPermissionsForGroup(ctx *gin.Context)
+	// AddPermissionsForRole 角色添加权限
+	AddPermissionsForRole(ctx *gin.Context)
 
-	// AddUserIntoGroup 添加用户-用户组关联
-	AddUserIntoGroup(ctx *gin.Context)
+	// AddUserIntoRole 添加用户-角色关联
+	AddUserIntoRole(ctx *gin.Context)
+
+	// DeletePermission 移除权限，且解除权限-角色关联
+	DeletePermission(ctx *gin.Context)
+
+	// DeleteRole 删除角色，且解除角色与权限关联及角色与用户关联
+	DeleteRole(ctx *gin.Context)
+
+	// RoleRemoveUser 用户移除角色
+	RoleRemoveUser(ctx *gin.Context)
 }
