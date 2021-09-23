@@ -9,6 +9,9 @@ type IUser interface {
 	// Login 登录接口
 	Login(ctx *gin.Context)
 
+	// Logout 登出接口
+	Logout(ctx *gin.Context)
+
 	// Register 注册接口
 	Register(ctx *gin.Context)
 

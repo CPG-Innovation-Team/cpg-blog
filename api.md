@@ -160,7 +160,7 @@
 	uri:/admin/article/update
     query:
         {
-            "aid":1, //必传
+            "sn":1, //必传
             "title": "update22",
             "cover": "update22",
             "content": "update222",

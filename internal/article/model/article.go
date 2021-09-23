@@ -3,8 +3,8 @@ package model
 import "time"
 
 type Article struct {
-	Aid       int `gorm:"primaryKey; autoIncrement;"`
-	Sn        int64
+	Aid       int   `gorm:"primaryKey; autoIncrement;"`
+	Sn        int64 `gorm:"primaryKey"`
 	Title     string
 	Uid       int `gorm:"column:uid"`
 	Cover     string
@@ -16,7 +16,7 @@ type Article struct {
 }
 
 type ArticleEx struct {
-	Aid       int `gorm:"primaryKey; autoIncrement;"`
+	Sn        int64 `gorm:"primaryKey"`
 	ViewNum   int
 	CmtNum    int
 	ZanNum    int
