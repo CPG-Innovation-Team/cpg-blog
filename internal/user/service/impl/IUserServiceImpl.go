@@ -14,6 +14,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -113,6 +114,11 @@ func (u *Users) Login(ctx *gin.Context) {
 		Token: token,
 	}
 	common.SendResponse(ctx, common.OK, loginVo)
+}
+
+func (u *Users) Logout(ctx *gin.Context){
+	ctx.SetCookie("token", "", 0,"/","",false,true)
+	ctx.Redirect(http.StatusMovedPermanently,"/")
 }
 
 func (u Users) Register(ctx *gin.Context) {

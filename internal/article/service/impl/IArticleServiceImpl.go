@@ -165,16 +165,27 @@ func (a Article) Update(ctx *gin.Context) {
 	}
 	updateDAO := new(dao.ArticleDAO)
 	copier.Copy(updateDAO, updateQO)
-	state,_:= strconv.Atoi(updateQO.State)
-	updateDAO.State= state
-	if state!=unreviewed&&state!=published&&state!=removed&&state!=deleted{
-		common.SendResponse(ctx,common.ErrParam,"")
+
+	//校验文章是否存在
+	number := globalInit.Db.Model(&model.Article{}).
+		Where("sn", updateDAO.Sn).
+		First(&model.Article{}).RowsAffected
+	if number == 0 {
+		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
+		return
+	}
+
+	//校验state
+	state, _ := strconv.Atoi(updateQO.State)
+	updateDAO.State = state
+	if state != unreviewed && state != published && state != removed && state != deleted {
+		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
 	err := updateDAO.UpdateArticle(ctx)
 	if err != nil {
-		common.SendResponse(ctx,common.ErrDatabase,err)
+		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
 	}
-	common.SendResponse(ctx,common.OK,"")
+	common.SendResponse(ctx, common.OK, "")
 }

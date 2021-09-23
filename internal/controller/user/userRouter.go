@@ -17,6 +17,9 @@ func (u Controller) RegisterSpecialRoute(g *gin.RouterGroup){
 }
 // RegisterRoute 添加user服务路由
 func (u Controller) RegisterRoute(g *gin.RouterGroup) {
+
+	g.POST("/logout", user.Logout)
+
 	query := g.Group("/user/query")
 	update := g.Group("/user/update")
 

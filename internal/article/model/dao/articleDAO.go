@@ -13,7 +13,7 @@ import (
 )
 
 type ArticleDAO struct {
-	Aid     int `json:"aid"`
+	Aid     int   `json:"aid"`
 	Sn      int64 `json:"sn"`
 	Title   string
 	Uid     int `json:"uid"`
@@ -45,6 +45,8 @@ func (ad ArticleDAO) CreatArticle(ctx *gin.Context, article *model.Article) (err
 			return tx.Error
 		}
 		tx.Create(article)
+		//文章扩展表插入一条记录
+		tx.Error = ad.creatArticleEx(article.Sn)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error
@@ -71,7 +73,7 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 	}
 
 	if ad.Sn != 0 { //sn精确搜索
-		tx = tx.Where("sn", ad.Sn)
+		tx = tx.Where("cpg_blog_article.sn", ad.Sn)
 	}
 	if ad.Title != "" { //title模糊搜索
 		tx = tx.Where("title Like ?", addPercent(ad.Title))
@@ -99,8 +101,8 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 	}
 	tx, pageVO := ad.Page.NewPageVO(tx)
 	articlesVO.PageVO = *pageVO
-	row, err := tx.Select("cpg_blog_article.aid,sn, title, uid, cover, content, tags, state, view_num, cmt_num, zan_num").
-		Joins("LEFT JOIN cpg_blog_article_ex ON cpg_blog_article.aid = cpg_blog_article_ex.aid ").Rows()
+	row, err := tx.Select("aid,cpg_blog_article.sn, title, uid, cover, content, tags, state, view_num, cmt_num, zan_num").
+		Joins("LEFT JOIN cpg_blog_article_ex ON cpg_blog_article.sn = cpg_blog_article_ex.sn ").Rows()
 
 	defer func(row *sql.Rows) {
 		err := row.Close()
@@ -123,17 +125,27 @@ func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO
 	return
 }
 
-func (ad ArticleDAO) FindArticleEx() {
-
+func (ad ArticleDAO) creatArticleEx(sn int64) (err error) {
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		tx.Create(&model.ArticleEx{Sn: sn})
+		log.Println("tx:",tx.Error)
+		if tx.Error != nil {
+			tx.Rollback()
+			return tx.Error
+		}
+		return tx.Commit().Error
+	}(tx)
+	return
 }
 
 func (ad ArticleDAO) UpdateArticle(ctx *gin.Context) (err error) {
-	tx := globalInit.Transaction().Model(&model.Article{}).Where("aid", ad.Aid)
+	tx := globalInit.Transaction().Model(&model.Article{}).Where("sn", ad.Sn)
 	err = func(db *gorm.DB) error {
 		if tx.Error != nil {
 			return tx.Error
 		}
-		tx.Omit("aid","sn","uid").Update("state",ad.State).Updates(ad)
+		tx.Omit("aid", "sn", "uid").Update("state", ad.State).Updates(ad)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error

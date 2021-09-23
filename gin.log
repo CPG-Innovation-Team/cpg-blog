@@ -1,1 +1,2 @@
-[GIN] 2021/09/22 - 11:56:44 | 200 |     13.4492ms |             ::1 | POST     "/admin/article/update"
+[GIN] 2021/09/23 - 18:42:59 | 200 |      7.5836ms |             ::1 | POST     "/admin/article/update"
+[GIN] 2021/09/23 - 18:44:34 | 200 |      6.5132ms |             ::1 | POST     "/admin/article/update"

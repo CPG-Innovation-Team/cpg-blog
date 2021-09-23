@@ -110,7 +110,7 @@ type UpdateArticleQO struct {
 	/*
 		文章id，关联扩展表aid
 	*/
-	Aid int `json:"aid" binding:"required"`
+	Sn int64 `json:"sn" binding:"required"`
 	/*
 		文章标题
 	*/
