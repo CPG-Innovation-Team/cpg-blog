@@ -20,6 +20,7 @@ var (
 func init() {
 	globalInit.ViperInit()
 	globalInit.DbInit()
+	globalInit.RedisInit()
 	globalInit.App.SetFrameMode(gin.ReleaseMode)
 	globalInit.App.FillBuildInfo(gitCommitLog, buildTime, gitRelease)
 	globalInit.App.SetLog(viper.GetBool("log.isStdout"))

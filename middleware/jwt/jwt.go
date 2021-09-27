@@ -62,7 +62,7 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
 				return nil, common.ErrTokenNotValidYet
 			} else {
-				return nil, common.ErrTokenInvalid
+				return nil, common.ErrHandleToken
 			}
 
 		}
@@ -72,7 +72,7 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, common.ErrTokenInvalid
+	return nil, common.ErrHandleToken
 }
 
 // RefreshToken 刷新token
@@ -91,5 +91,5 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 		claims.StandardClaims.ExpiresAt = time.Now().Add(1 * time.Hour).Unix()
 		return j.CreateToken(*claims)
 	}
-	return "", common.ErrTokenInvalid
+	return "", common.ErrHandleToken
 }

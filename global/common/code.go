@@ -11,9 +11,10 @@ var (
 	ErrTokenExpired     = &Errno{Code: 10004, Message: "Token is expired."}
 	ErrTokenNotValidYet = &Errno{Code: 10005, Message: "Token not active yet."}
 	ErrTokenMalformed   = &Errno{Code: 10006, Message: "That's not even a token."}
-	ErrTokenInvalid     = &Errno{Code: 10007, Message: "Couldn't handle this token:"}
+	ErrHandleToken      = &Errno{Code: 10007, Message: "Couldn't handle this token:"}
 	ErrGenerateToken    = &Errno{Code: 10008, Message: "Generate Token is wrong."}
 	ErrParam            = &Errno{Code: 10009, Message: "Invalid Param."}
+	ErrRedis            = &Errno{Code: 10010, Message: "Redis Has Some Err."}
 
 	/*
 		system errors
