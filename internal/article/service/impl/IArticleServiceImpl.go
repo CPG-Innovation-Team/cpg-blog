@@ -2,6 +2,7 @@ package impl
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/article/model"
 	"cpg-blog/internal/article/model/dao"
@@ -179,13 +180,20 @@ func (a Article) Update(ctx *gin.Context) {
 	}
 	updateDAO := new(dao.ArticleDAO)
 	copier.Copy(updateDAO, updateQO)
+	oldArticle := &model.Article{}
 
 	//校验文章是否存在
 	number := globalInit.Db.Model(&model.Article{}).
 		Where("sn", updateDAO.Sn).
-		First(&model.Article{}).RowsAffected
+		First(oldArticle).RowsAffected
 	if number == 0 {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
+		return
+	}
+	tokenInfo, _ := tokenInfo(ctx)
+	tokenUid, _ := strconv.Atoi(tokenInfo.Uid)
+	if tokenInfo.Root != cpgConst.Root && tokenUid != oldArticle.Uid {
+		common.SendResponse(ctx, common.OK, "暂无权限修改该文章！")
 		return
 	}
 
