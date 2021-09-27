@@ -193,7 +193,7 @@ func (a Article) Update(ctx *gin.Context) {
 	tokenInfo, _ := tokenInfo(ctx)
 	tokenUid, _ := strconv.Atoi(tokenInfo.Uid)
 	if tokenInfo.Root != cpgConst.Root && tokenUid != oldArticle.Uid {
-		common.SendResponse(ctx, common.OK, "暂无权限修改该文章！")
+		common.SendResponse(ctx, common.ErrAccessDenied, "暂无权限修改该文章！")
 		return
 	}
 
