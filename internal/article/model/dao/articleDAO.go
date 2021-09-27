@@ -129,7 +129,7 @@ func (ad ArticleDAO) creatArticleEx(sn int64) (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		tx.Create(&model.ArticleEx{Sn: sn})
-		log.Println("tx:",tx.Error)
+		log.Println("tx:", tx.Error)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error

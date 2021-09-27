@@ -35,6 +35,11 @@ const (
 
 var userService = &impl.Users{}
 
+func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
+	Info, err = jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+	return
+}
+
 // Info 根据sn查询
 func (a Article) Info(ctx *gin.Context) {
 	infoQO := new(qo.ArticleInfoQO)
@@ -74,7 +79,7 @@ func (a Article) List(ctx *gin.Context) {
 
 	//是否查询自身的所有文章
 	if listQuery.IsAllMyselfArticles {
-		token, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+		token, err := tokenInfo(ctx)
 		if err != nil {
 			common.SendResponse(ctx, err, "")
 			return
@@ -110,9 +115,9 @@ func (a Article) Add(ctx *gin.Context) {
 		return
 	}
 	//用户UID从token中解析
-	token, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+	token, err := tokenInfo(ctx)
 	if err != nil {
-		common.SendResponse(ctx, common.ErrTokenInvalid, "")
+		common.SendResponse(ctx, common.ErrHandleToken, "")
 		return
 	}
 	article.Uid, _ = strconv.Atoi(token.Uid)
@@ -137,7 +142,9 @@ func (a Article) Delete(ctx *gin.Context) {
 	deleteQO := new(qo.ArticleInfoQO)
 	util.JsonConvert(ctx, deleteQO)
 	var articleList []model.Article
+
 	tx := globalInit.Db.Where("sn", deleteQO.Sn).Find(&articleList)
+
 	if len(articleList) == 0 {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
 		return
@@ -146,6 +153,13 @@ func (a Article) Delete(ctx *gin.Context) {
 		common.SendResponse(ctx, common.OK, "")
 		return
 	}
+
+	//tokenInfo, _ := tokenInfo(ctx)
+	//tokenUid,_ := strconv.Atoi(tokenInfo.Uid)
+	//if tokenInfo.Root != cpgConst.Root &&  tokenUid != articleList[0].Uid{
+	//	common.SendResponse(ctx, common.ErrAccessDenied, "")
+	//}
+
 	tx.Update("state", deleted).Commit()
 	common.SendResponse(ctx, common.OK, "")
 }

@@ -3,6 +3,7 @@ package middleware
 import (
 	"cpg-blog/global/common"
 	"cpg-blog/global/cpgConst"
+	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/auth"
 	"cpg-blog/middleware/jwt"
 	"github.com/gin-gonic/gin"
@@ -51,7 +52,7 @@ func Secure(ctx *gin.Context) {
 	// c.Header("Content-Security-Policy", "script-src 'self' https://cdnjs.cloudflare.com")
 }
 
-// JwtAuth 校验token
+// JwtAuth 校验token,优先校验redis中是否存在token,在校验是否过期等
 func JwtAuth(ctx *gin.Context) {
 	token := ctx.Request.Header.Get("token")
 	if token == "" {
@@ -59,6 +60,17 @@ func JwtAuth(ctx *gin.Context) {
 		common.SendResponse(ctx, common.ErrToken, "")
 		return
 	}
+	//b, err := globalInit.RedisClient.Get(ctx, token).Bool()
+	//if err != nil {
+	//	return
+	//}
+	redisToken := globalInit.RedisClient.SIsMember(ctx,"token",token)
+	if !redisToken.Val(){
+		ctx.Abort()
+		common.SendResponse(ctx, common.ErrToken, "")
+		return
+	}
+
 	j := jwt.NewJWT()
 	claims, err := j.ParseToken(token)
 	if err != nil {
@@ -69,7 +81,7 @@ func JwtAuth(ctx *gin.Context) {
 			return
 		}
 		//其他错误
-		common.SendResponse(ctx, err, "")
+		common.SendResponse(ctx, common.ErrToken, "")
 		return
 	}
 	ctx.Set("claims", claims)

@@ -2,6 +2,9 @@ package cpgConst
 
 
 const (
+	// Root root用户标识
+	Root int = 1
+
 	// Operate 接口默认权限的操作权限为：write
 	Operate string = "write"
 

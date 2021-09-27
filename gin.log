@@ -1,2 +1,4 @@
-[GIN] 2021/09/23 - 18:42:59 | 200 |      7.5836ms |             ::1 | POST     "/admin/article/update"
-[GIN] 2021/09/23 - 18:44:34 | 200 |      6.5132ms |             ::1 | POST     "/admin/article/update"
+[GIN] 2021/09/27 - 12:33:27 | 200 |       741.3µs |             ::1 | POST     "/admin/logout"
+[GIN] 2021/09/27 - 12:34:21 | 200 |      9.0054ms |             ::1 | POST     "/admin/logout"
+[GIN] 2021/09/27 - 12:34:27 | 200 |       210.8µs |             ::1 | POST     "/admin/logout"
+[GIN] 2021/09/27 - 12:35:00 | 200 |      2.3261ms |             ::1 | POST     "/login"

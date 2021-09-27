@@ -26,6 +26,11 @@ max_conn = 10
 # 前缀
 prefix = "cpg_blog_"
 
+# redis配置
+[redis]
+host = "localhost"
+port = 6379
+
 # 监听端口
 [http]
 host = ""

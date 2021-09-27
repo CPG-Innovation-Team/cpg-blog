@@ -17,6 +17,19 @@
         }
 ```
 
+# 登出
+```
+	uri:/admin/logout
+    query:
+        {}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
 # 注册
 ```
 	uri:/register

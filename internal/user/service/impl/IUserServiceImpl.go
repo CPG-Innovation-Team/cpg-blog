@@ -14,7 +14,6 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 	"strconv"
 	"time"
 )
@@ -57,6 +56,18 @@ func genToken(info tokenInfo) (token string, err error) {
 	}
 	token, err = j.CreateToken(claims)
 	return token, err
+}
+
+//token添加进入redis
+func addTokenToRedis(ctx *gin.Context,token string) (err error) {
+	_, err = globalInit.RedisClient.SAdd(ctx, "token", token).Result()
+	return err
+}
+
+//redis移除对应token
+func removeTokenFromRedis(ctx *gin.Context,token string)  (err error){
+	_, err = globalInit.RedisClient.SRem(ctx, "token", token).Result()
+	return err
 }
 
 //加密
@@ -110,6 +121,11 @@ func (u *Users) Login(ctx *gin.Context) {
 	if err != nil {
 		common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
 	}
+
+	if ok := addTokenToRedis(ctx,token); ok != nil {
+		common.SendResponse(ctx, common.ErrRedis, "")
+		return
+	}
 	loginVo := vo.LoginVo{
 		Token: token,
 	}
@@ -117,8 +133,14 @@ func (u *Users) Login(ctx *gin.Context) {
 }
 
 func (u *Users) Logout(ctx *gin.Context){
-	ctx.SetCookie("token", "", 0,"/","",false,true)
-	ctx.Redirect(http.StatusMovedPermanently,"/")
+	token:= ctx.Request.Header.Get("token")
+	//清除redis对应token缓存
+	err := removeTokenFromRedis(ctx, token)
+	if err != nil {
+		common.SendResponse(ctx, common.ErrRedis, "")
+		return
+	}
+	common.SendResponse(ctx, common.OK, "")
 }
 
 func (u Users) Register(ctx *gin.Context) {
