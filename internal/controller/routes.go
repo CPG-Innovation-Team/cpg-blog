@@ -3,24 +3,25 @@ package controller
 import (
 	"cpg-blog/internal/controller/article"
 	"cpg-blog/internal/controller/auth"
+	"cpg-blog/internal/controller/like"
 	"cpg-blog/internal/controller/user"
 	"github.com/gin-gonic/gin"
 )
-
-func RegisterSpecialRoutes(g *gin.RouterGroup) {
-	new(user.Controller).RegisterSpecialRoute(g)
-}
-
-// RegisterRoutes 统一注册路由
-//func RegisterRoutes(g *gin.RouterGroup)  {
-//	new(user.Controller).RegisterRoute(g)
-//}
 
 type IRegisterRoute interface {
 	RegisterRoute(g *gin.RouterGroup)
 }
 
-// RegisterRoutes 统一注册路由
+func RegisterSpecialRoutes(g *gin.RouterGroup) {
+	new(user.Controller).RegisterSpecialRoute(g)
+}
+
+// RegisterPortalRoutes 统一注册portal路由
+func RegisterPortalRoutes(g *gin.RouterGroup)  {
+	IRegisterRoute.RegisterRoute(new(like.Controller), g)
+}
+
+// RegisterRoutes 统一注册admin路由
 func RegisterRoutes(g *gin.RouterGroup) {
 	IRegisterRoute.RegisterRoute(new(user.Controller), g)
 	IRegisterRoute.RegisterRoute(new(article.Controller), g)

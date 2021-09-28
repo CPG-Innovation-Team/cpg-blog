@@ -420,3 +420,20 @@
             "data":{}
         }
 ```
+
+
+# 点赞文章/评论
+```
+	uri:/like
+    query: //点赞,参数不允许同时为空/存在，二选一
+        {
+            "sn":1967400744308736,
+            "comment_id":0
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```

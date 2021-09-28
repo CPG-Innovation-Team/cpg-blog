@@ -15,6 +15,7 @@ func (u Controller) RegisterSpecialRoute(g *gin.RouterGroup){
 	//注册
 	g.POST("/register", user.Register)
 }
+
 // RegisterRoute 添加user服务路由
 func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 
