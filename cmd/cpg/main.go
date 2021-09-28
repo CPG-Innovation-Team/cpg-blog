@@ -37,8 +37,16 @@ func main() {
 	//TODO 服务访问权限，通过OAuth服务实现
 
 	// 后端路由组
+	//登录等特殊页
 	special := r.Group("")
 	controller.RegisterSpecialRoutes(special)
+
+	//门户页
+	portal:=r.Group("")
+	portal.Use(middleware.JwtAuth)
+	controller.RegisterPortalRoutes(portal)
+
+	//管理页
 	adminGroup := r.Group("/admin")
 	adminGroup.Use(middleware.JwtAuth)
 	adminGroup.Use(middleware.PermissionAuth)

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/article/model"
 	"cpg-blog/internal/article/vo"
@@ -59,6 +60,11 @@ func (ad ArticleDAO) CreatArticle(ctx *gin.Context, article *model.Article) (err
 func (ad ArticleDAO) SelectBySn(ctx *gin.Context, article *model.Article) *model.Article {
 	(*Db).Model(&model.Article{}).Where("sn", article.Sn).First(&article)
 	return article
+}
+
+func (ad ArticleDAO) SelectArticleBySn(sn int64) (a *model.Article) {
+	(*Db).Where(model.Article{Sn: sn}).First(&a)
+	return a
 }
 
 func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO) {
@@ -130,6 +136,41 @@ func (ad ArticleDAO) creatArticleEx(sn int64) (err error) {
 	err = func(db *gorm.DB) error {
 		tx.Create(&model.ArticleEx{Sn: sn})
 		log.Println("tx:", tx.Error)
+		if tx.Error != nil {
+			tx.Rollback()
+			return tx.Error
+		}
+		return tx.Commit().Error
+	}(tx)
+	return
+}
+
+func (ad ArticleDAO) UpdateArticleEx(sn int64, view bool, cmt bool, zan bool, add bool) (err error) {
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		var ex model.ArticleEx
+		tx.Where(&(model.ArticleEx{Sn: sn})).First(&ex)
+
+		var updateFiled string
+		var isAdd int
+		if add {
+			isAdd = cpgConst.ONE
+		} else {
+			isAdd = cpgConst.ONE - cpgConst.ONE
+		}
+
+		if view {
+			updateFiled = "view_num"
+			ex.ViewNum += isAdd
+		} else if cmt {
+			updateFiled = "cmt_num"
+			ex.CmtNum += isAdd
+		} else if zan {
+			updateFiled = "zan_num"
+			ex.ZanNum += isAdd
+		}
+
+		tx.Select(updateFiled).Updates(&ex)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error
