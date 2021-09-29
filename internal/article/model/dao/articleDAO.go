@@ -63,7 +63,7 @@ func (ad ArticleDAO) SelectBySn(ctx *gin.Context, article *model.Article) *model
 }
 
 func (ad ArticleDAO) SelectArticleBySn(sn int64) (a *model.Article) {
-	(*Db).Where(model.Article{Sn: sn}).First(&a)
+	(*Db).Where(model.Article{Sn: sn, State: cpgConst.ONE}).First(&a)
 	return a
 }
 
@@ -156,16 +156,25 @@ func (ad ArticleDAO) UpdateArticleEx(sn int64, view bool, cmt bool, zan bool, ad
 		if add {
 			isAdd = cpgConst.ONE
 		} else {
-			isAdd = cpgConst.ONE - cpgConst.ONE
+			isAdd = cpgConst.ZERO - cpgConst.ONE
 		}
 
 		if view {
+			if !add && ex.ViewNum == cpgConst.ZERO{
+				return nil
+			}
 			updateFiled = "view_num"
 			ex.ViewNum += isAdd
 		} else if cmt {
+			if !add && ex.CmtNum == cpgConst.ZERO{
+				return nil
+			}
 			updateFiled = "cmt_num"
 			ex.CmtNum += isAdd
 		} else if zan {
+			if !add && ex.ZanNum == cpgConst.ZERO{ //取消点赞时，防止出现负数
+				return nil
+			}
 			updateFiled = "zan_num"
 			ex.ZanNum += isAdd
 		}
