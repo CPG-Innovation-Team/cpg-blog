@@ -15,4 +15,7 @@ func (L Controller) RegisterRoute(g *gin.RouterGroup) {
 
 	//点赞
 	likeGroup.POST("", like.Like)
+
+	//取消点赞
+	likeGroup.POST("/cancel", like.CancelLike)
 }

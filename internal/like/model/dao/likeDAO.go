@@ -6,7 +6,6 @@ import (
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/like/model"
 	"gorm.io/gorm"
-	"log"
 	"reflect"
 )
 
@@ -14,30 +13,36 @@ type LikeDAO struct{}
 
 var Db = &(globalInit.Db)
 
-func (d LikeDAO) Creat(uid int, objType int, objId int64) (err error) {
+func (d LikeDAO) SelectZan(uid int, objType int, objId int64) (zan model.Zan) {
+	(*Db).Where(&model.Zan{Uid: uint(uid), ObjType: objType, ObjId: objId}).Find(&zan)
+	return
+}
+
+func (d LikeDAO) CreatOrUpdate(uid int, objType int, objId int64, cancelLike bool) (err error) {
 	tx := globalInit.Transaction()
 
 	err = func(db *gorm.DB) error {
 		var zan model.Zan
-		tx.Where(&model.Zan{Uid: uint(uid), ObjId: objId}).First(&zan)
+		tx.Where(&model.Zan{Uid: uint(uid), ObjType: objType, ObjId: objId}).First(&zan)
 		if tx.Error != nil {
 			return tx.Error
 		}
 
 		//是否存在点赞记录
 		if reflect.DeepEqual(zan, model.Zan{}) {
-			log.Println("dddd", zan)
 			tx.Create(&model.Zan{
 				Uid:     uint(uid),
 				ObjType: objType,
 				ObjId:   objId,
 				State:   cpgConst.ZERO,
 			})
-		} else if zan.State == cpgConst.ONE {
-			//存在记录则只更新状态
+		} else if zan.State == cpgConst.ONE && !cancelLike{//存在记录则只更新状态
 			zan.State = cpgConst.ZERO
 			tx.Select("state").Updates(zan)
-		} else if zan.State == cpgConst.ZERO {
+		} else if zan.State == cpgConst.ZERO && cancelLike{
+			zan.State = cpgConst.ONE
+			tx.Select("state").Updates(zan)
+		}else{
 			return common.OK
 		}
 
