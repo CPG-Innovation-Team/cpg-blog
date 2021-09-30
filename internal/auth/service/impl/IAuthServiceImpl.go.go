@@ -142,7 +142,10 @@ func (a Auth) AddUserIntoRole(ctx *gin.Context) {
 	util.JsonConvert(ctx, userIntoGroup)
 	uid := strconv.Itoa(userIntoGroup.Uid)
 	e, _ := auth.GetE(ctx)
-	result, err := e.AddRoleForUser(cpgConst.UserPrefix+uid, userIntoGroup.RName)
+
+	//TODO 校验角色是否存在
+
+	result, err := e.AddRoleForUser(cpgConst.UserPrefix+uid, cpgConst.RolePrefix+userIntoGroup.RName)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
