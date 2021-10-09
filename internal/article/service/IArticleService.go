@@ -1,6 +1,9 @@
 package service
 
-import "github.com/gin-gonic/gin"
+import (
+	"cpg-blog/internal/article/model"
+	"github.com/gin-gonic/gin"
+)
 
 type IArticle interface {
 	//Info 查询文章详情
@@ -17,4 +20,7 @@ type IArticle interface {
 
 	// Update 更新文章
 	Update(ctx *gin.Context)
+
+	// FindArticles 服务间查询文章信息，支持list
+	FindArticles(ctx *gin.Context, sn []int64)(articlesMap map[int64]model.Article)
 }
