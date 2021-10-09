@@ -8,7 +8,7 @@ import (
 	"cpg-blog/internal/article/model/dao"
 	"cpg-blog/internal/article/qo"
 	"cpg-blog/internal/article/vo"
-	"cpg-blog/internal/user/service/impl"
+	"cpg-blog/internal/user/service"
 	"cpg-blog/middleware/jwt"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -34,11 +34,32 @@ const (
 	deleted
 )
 
-var userService = &impl.Users{}
+var userService service.IUser
 
 func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	Info, err = jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 	return
+}
+
+func (a Article) FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
+	var articles []model.Article
+	articles = []model.Article{}
+	articlesMap = map[int64]model.Article{}
+
+	tx := globalInit.Db.WithContext(ctx).Model(&model.Article{})
+	if len(sn) == cpgConst.ONE {
+		tx.Where("sn", sn[0])
+	}
+
+	if len(sn) > cpgConst.ZERO {
+		tx.Where("sn In", sn)
+	}
+	tx.Where("state", cpgConst.ONE).Find(articles)
+
+	for _, v := range articles {
+		articlesMap[v.Sn] = v
+	}
+	return articlesMap
 }
 
 // Info 根据sn查询
