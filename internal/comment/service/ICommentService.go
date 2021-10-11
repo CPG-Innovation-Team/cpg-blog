@@ -12,8 +12,8 @@ type Comment interface {
 	// Delete 删除评论
 	Delete(ctx *gin.Context)
 
-	// Reply 回复评论
-	Reply(ctx *gin.Context)
+	// AddReply 回复评论
+	AddReply(ctx *gin.Context)
 
 	// DeleteReply 删除回复
 	DeleteReply(ctx *gin.Context)
