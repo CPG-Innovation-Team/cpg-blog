@@ -453,3 +453,19 @@
             "data":{}
         }
 ```
+
+# 新增评论
+```
+	uri:/comment/add
+    query: //必填
+        {
+            "sn":1967400744308736,
+            "content":""
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```

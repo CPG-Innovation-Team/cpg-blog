@@ -5,6 +5,7 @@ import (
 	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/like/model"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"reflect"
 )
@@ -36,16 +37,29 @@ func (d LikeDAO) CreatOrUpdate(uid int, objType int, objId int64, cancelLike boo
 				ObjId:   objId,
 				State:   cpgConst.ZERO,
 			})
-		} else if zan.State == cpgConst.ONE && !cancelLike{//存在记录则只更新状态
+		} else if zan.State == cpgConst.ONE && !cancelLike { //存在记录则只更新状态
 			zan.State = cpgConst.ZERO
 			tx.Select("state").Updates(zan)
-		} else if zan.State == cpgConst.ZERO && cancelLike{
+		} else if zan.State == cpgConst.ZERO && cancelLike {
 			zan.State = cpgConst.ONE
 			tx.Select("state").Updates(zan)
-		}else{
+		} else {
 			return common.OK
 		}
 
+		if tx.Error != nil {
+			tx.Rollback()
+			return tx.Error
+		}
+		return tx.Commit().Error
+	}(tx)
+	return err
+}
+
+func (d LikeDAO) Update(ctx *gin.Context, objId int64, state int) (err error) {
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		tx.Where("obj_id", objId).Update("state", state)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error

@@ -232,3 +232,7 @@ func (a Article) Update(ctx *gin.Context) {
 	}
 	common.SendResponse(ctx, common.OK, "")
 }
+
+func (a Article) UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error {
+	return dao.ArticleDAO{}.UpdateArticleEx(sn, view, cmt, zan, add)
+}
