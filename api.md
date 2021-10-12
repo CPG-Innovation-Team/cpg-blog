@@ -504,3 +504,60 @@
             }
         }
 ```
+
+# 删除评论回复
+```
+	uri:/comment/reply/delete
+    query: //必填
+        {
+            "id":111 //回复id
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 查询文章所有评论及回复
+```
+	uri:/comment/list
+    query: //必填
+        {
+            "sn":111
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                1:{ //楼层
+	                cid: 111, //自增ID
+	                sn: 111, //文章sn号
+		            uid: 111, //评论用户uid
+		            content: "hello", //评论内容
+		            zanNum： 111, //点赞数
+		            floor： 1, //第几楼
+		            state： 1, //状态：0-未审核;1-已上线;2-下线(审核拒绝);3-用户删除
+		            createdAt: 2020.0189
+		            replyList:[{
+		                	id: 111, //自增ID
+	                        cid: 111, //评论cid
+	                        uid: 111, //回复用户uid
+	                        content: "hello", //回复内容
+	                        state： 1 //状态：0-未审核;1-已上线;2-下线(审核拒绝);3-用户删除
+	                        createdAt: 2020.0189
+		                    },
+		                    {
+		                	id: 111, //自增ID
+	                        cid: 111, //评论cid
+	                        uid: 111, //回复用户uid
+	                        content: "hello", //回复内容
+	                        state： 1 //状态：0-未审核;1-已上线;2-下线(审核拒绝);3-用户删除
+	                        createdAt: 2020.0189
+		                    }]
+		            }
+            }
+        }
+```

@@ -14,6 +14,7 @@ import (
 	"cpg-blog/middleware/jwt"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 	"reflect"
 	"strconv"
 )
@@ -51,7 +52,40 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 	return jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 }
 
-func (c Comment) List(ctx *gin.Context) {}
+//List
+/**
+* @Author: ethan.chen@cpgroup.cn
+* @Date: 2021/10/12 17:13
+* @Description: 查询文章所有评论及回复
+* @Params:
+* @Return:
+**/
+func (c Comment) List(ctx *gin.Context) {
+	listQO := qo.ListQO{}
+	util.JsonConvert(ctx,listQO)
+	listMap:= map[int]vo.CommentListVO{}
+
+	//通过sn查询文章所有评论，生成以floor为key,listVO为value
+	var comments []model.Comment
+	globalInit.Db.Model(model.Comment{}).Where("sn",listQO.Sn).Find(&comments)
+	if len(comments) ==0{
+		common.SendResponse(ctx,common.OK,listMap)
+		return
+	}
+
+	for _,v:=range comments{
+		_ = copier.Copy(listMap[v.Floor],v)
+
+		//根据cid查询comment下所有的回复
+		var replies []model.CommentReply
+		var replyList []vo.ReplyVO
+		globalInit.Db.Model(model.CommentReply{}).Where("cid",v.Cid).Find(&replies)
+		_ = copier.Copy(replyList,replies)
+		copy(listMap[v.Floor].ReplyList, replyList)
+	}
+
+	common.SendResponse(ctx,common.OK,listMap)
+}
 
 //Add
 /**
@@ -151,7 +185,7 @@ func (c Comment) Delete(ctx *gin.Context) {
 
 	if !reflect.DeepEqual([]model.CommentReply{}, commentReply) {
 		//删除该Cid下所有回复
-		err := dao.CommentReplyDao{Cid: comment.Cid, State: cpgConst.THREE}.UpdateCommentReply(ctx)
+		err := dao.CommentReplyDao{Cid: comment.Cid, State: cpgConst.THREE}.UpdateCommentReplyByCid(ctx)
 		if err != nil {
 			common.SendResponse(ctx, err, "")
 			return
@@ -226,7 +260,19 @@ func (c Comment) AddReply(ctx *gin.Context) {
 * @Author: ethan.chen@cpgroup.cn
 * @Date: 2021/10/11 15:10
 * @Description: 删除回复
-* @Params:
+* @Params: DeleteCommentReplyQO
 * @Return:
 **/
-func (c Comment) DeleteReply(ctx *gin.Context) {}
+func (c Comment) DeleteReply(ctx *gin.Context) {
+	deleteQO := qo.DeleteCommentReplyQO{}
+	util.JsonConvert(ctx,deleteQO)
+
+	err := dao.CommentReplyDao{Id: uint(deleteQO.Id), State: cpgConst.THREE}.DeleteCommentReplyById(ctx)
+	if err != nil {
+		e := common.ErrDatabase
+		e.Message = err.Error()
+		common.SendResponse(ctx, e, "")
+		return
+	}
+	common.SendResponse(ctx,common.OK,"")
+}
