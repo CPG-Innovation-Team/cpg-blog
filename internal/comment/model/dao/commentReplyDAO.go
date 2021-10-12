@@ -25,17 +25,17 @@ type CommentReplyDao model.CommentReply
 * @Return: error
 **/
 
-func (c CommentReplyDao) BeforeCreate(tx *gorm.DB) (err error){
-	result:=tx.Find(&c)
-	if result.RowsAffected != 0{
+func (c CommentReplyDao) BeforeCreate(tx *gorm.DB) (err error) {
+	result := tx.Find(&c)
+	if result.RowsAffected != 0 {
 		return result.Error
 	}
 	return
 }
 
-func (c CommentReplyDao) BeforeUpdate(tx *gorm.DB) (err error){
-	result:=tx.Find(&c)
-	if result.RowsAffected != 0{
+func (c CommentReplyDao) BeforeUpdate(tx *gorm.DB) (err error) {
+	result := tx.Find(&c)
+	if result.RowsAffected != 0 {
 		return result.Error
 	}
 	return
@@ -46,7 +46,7 @@ func (c CommentReplyDao) UpdateCommentReply(ctx *gin.Context) (err error) {
 	tx.Model(c)
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Select("content","state").Where("cid",c.Cid).Updates(c)
+		tx.Select("content", "state").Where("cid", c.Cid).Updates(c)
 
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
@@ -61,4 +61,24 @@ func (c CommentReplyDao) UpdateCommentReply(ctx *gin.Context) (err error) {
 		return nil
 	}(tx)
 	return
+}
+
+func (c CommentReplyDao) CreateCommentReply(ctx *gin.Context) (replyId uint, err error) {
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		e := common.ErrDatabase
+		tx.Create(c)
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+
+		tx.Commit()
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+		return nil
+	}(tx)
+	return c.Id, err
 }

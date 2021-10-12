@@ -10,3 +10,8 @@ type DeleteCommentQO struct {
 	//评论ID
 	CommentId int `binding:"required"`
 }
+
+type DeleteCommentReplyQO struct {
+	//评论回复ID
+	Id int `binding:"required"`
+}

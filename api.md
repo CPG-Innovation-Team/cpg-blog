@@ -469,3 +469,18 @@
             "data":{}
         }
 ```
+
+# 删除评论
+```
+	uri:/comment/delete
+    query: //必填
+        {
+            "commentId":1967400744308736
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```

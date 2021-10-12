@@ -18,23 +18,23 @@ type CommentDao model.Comment
 
 var Db = &(globalInit.Db)
 
-func (c CommentDao) BeforeCreate(tx *gorm.DB) (err error){
-	result:=tx.Find(&c)
-	if result.RowsAffected != 0{
+func (c CommentDao) BeforeCreate(tx *gorm.DB) (err error) {
+	result := tx.Find(&c)
+	if result.RowsAffected != 0 {
 		return result.Error
 	}
 	return
 }
 
-func (c CommentDao) BeforeUpdate(tx *gorm.DB) (err error){
-	result:=tx.Find(&c)
-	if result.RowsAffected != 0{
+func (c CommentDao) BeforeUpdate(tx *gorm.DB) (err error) {
+	result := tx.Find(&c)
+	if result.RowsAffected != 0 {
 		return result.Error
 	}
 	return
 }
 
-func (c CommentDao) CreateComment(ctx *gin.Context) (err error) {
+func (c CommentDao) CreateComment(ctx *gin.Context) (cid uint, err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
@@ -51,14 +51,14 @@ func (c CommentDao) CreateComment(ctx *gin.Context) (err error) {
 		}
 		return nil
 	}(tx)
-	return
+	return c.Cid, err
 }
 
 func (c CommentDao) UpdateComment(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Select("content","zan_num","state").Updates(c)
+		tx.Select("content", "zan_num", "state").Updates(c)
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
 			return e
