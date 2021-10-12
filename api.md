@@ -466,7 +466,9 @@
         {
             "code":"code",
             "message": "message",
-            "data":{}
+            "data":{
+            "commentId":122
+            }
         }
 ```
 
@@ -482,5 +484,23 @@
             "code":"code",
             "message": "message",
             "data":{}
+        }
+```
+
+# 新增评论回复
+```
+	uri:/comment/reply
+    query: //必填
+        {
+            "commentId":111,
+            "content":""
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+            "commentReplyId":122
+            }
         }
 ```
