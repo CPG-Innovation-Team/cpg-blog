@@ -23,7 +23,7 @@ func (c Controller) RegisterRoute(g *gin.RouterGroup)  {
 	commentGroup.POST("/delete", comment.Delete)
 
 	//回复评论
-	commentGroup.POST("/reply", comment.Reply)
+	commentGroup.POST("/reply", comment.AddReply)
 
 	//删除回复
 	commentGroup.POST("/reply/delete", comment.DeleteReply)
