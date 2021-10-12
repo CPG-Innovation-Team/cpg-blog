@@ -16,7 +16,7 @@ import (
 
 type CommentReplyDao model.CommentReply
 
-//UpdateCommentReply
+//UpdateCommentReplyByCid
 /**
 * @Author: ethan.chen@cpgroup.cn
 * @Date: 2021/10/11 15:50
@@ -41,7 +41,7 @@ func (c CommentReplyDao) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (c CommentReplyDao) UpdateCommentReply(ctx *gin.Context) (err error) {
+func (c CommentReplyDao) UpdateCommentReplyByCid(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	tx.Model(c)
 	err = func(db *gorm.DB) error {
@@ -81,4 +81,26 @@ func (c CommentReplyDao) CreateCommentReply(ctx *gin.Context) (replyId uint, err
 		return nil
 	}(tx)
 	return c.Id, err
+}
+
+func (c CommentReplyDao) DeleteCommentReplyById(ctx *gin.Context) (err error) {
+	tx := globalInit.Transaction()
+	tx.Model(c)
+	err = func(db *gorm.DB) error {
+		e := common.ErrDatabase
+		tx.Select("state").Where("id", c.Id).Updates(c)
+
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+
+		tx.Commit()
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+		return nil
+	}(tx)
+	return
 }

@@ -1,3 +1,0 @@
-[GIN] 2021/09/30 - 13:57:33 | 500 |     20.0791ms |             ::1 | POST     "/admin/auth/role/add/user"
-[GIN] 2021/09/30 - 13:58:57 | 200 |      8.9464ms |             ::1 | POST     "/admin/auth/role/add/user"
-[GIN] 2021/09/30 - 13:59:25 | 200 |      10.967ms |             ::1 | POST     "/admin/auth/role/remove/user"
