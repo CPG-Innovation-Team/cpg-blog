@@ -8,6 +8,7 @@ import (
 	"cpg-blog/internal/comment/model"
 	"cpg-blog/internal/comment/model/dao"
 	"cpg-blog/internal/comment/qo"
+	"cpg-blog/internal/comment/vo"
 	Like "cpg-blog/internal/like/service"
 	User "cpg-blog/internal/user/service"
 	"cpg-blog/middleware/jwt"
@@ -25,6 +26,31 @@ var (
 	likeService    Like.ILike
 )
 
+/**
+* @Author: ethan.chen@cpgroup.cn
+* @Date: 2021/10/12 14:02
+* @Description: 查询未删除的评论信息
+* @Params: cid
+* @Return: model.Comment
+**/
+func (c Comment) commentInfo(cid int) (comment model.Comment) {
+	globalInit.Db.Model(&model.Comment{}).
+		Where("cid = ? and state = ?", cid, cpgConst.ONE).
+		First(comment)
+	return
+}
+
+/**
+* @Author: ethan.chen@cpgroup.cn
+* @Date: 2021/10/12 14:42
+* @Description: 查询token信息
+* @Params: *gin.Context
+* @Return: info *jwt.CustomClaims, err error
+**/
+func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error) {
+	return jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+}
+
 func (c Comment) List(ctx *gin.Context) {}
 
 //Add
@@ -37,30 +63,30 @@ func (c Comment) List(ctx *gin.Context) {}
 **/
 func (c Comment) Add(ctx *gin.Context) {
 	var comment dao.CommentDao
-	token := ctx.Request.Header.Get("token")
-	claims, _ := new(jwt.JWT).ParseToken(token)
+	claims, _ := c.tokenInfo(ctx)
 	uid, _ := strconv.Atoi(claims.Uid)
 	comment.UID = uint(uid)
 
 	addQO := new(qo.AddCommentQO)
 	util.JsonConvert(ctx, addQO)
+	commentVO := vo.AddCommentVO{}
 
 	if addQO.Content == "" {
-		common.SendResponse(ctx, common.ErrParam, "")
+		common.SendResponse(ctx, common.ErrParam, commentVO)
 		return
 	}
 
 	//查询用户是否存在
 	user := userService.FindUser(ctx, []int{int(comment.UID)}, "", "")
 	if userInfo, ok := user[comment.UID]; !ok || int(userInfo.State) != cpgConst.ONE {
-		common.SendResponse(ctx, common.ErrUserNotFound, "")
+		common.SendResponse(ctx, common.ErrUserNotFound, commentVO)
 		return
 	}
 
 	//查询文章是否存在
 	articleMap := articleService.FindArticles(ctx, []int64{addQO.Sn})
 	if article, ok := articleMap[addQO.Sn]; !ok || article.State != cpgConst.ONE {
-		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
+		common.SendResponse(ctx, common.ErrArticleNotExisted, commentVO)
 		return
 	}
 
@@ -83,12 +109,15 @@ func (c Comment) Add(ctx *gin.Context) {
 	if floor > cpgConst.ZERO {
 		comment.Floor = floor + cpgConst.ONE
 	}
-	err := comment.CreateComment(ctx)
+	cid, err := comment.CreateComment(ctx)
 	if err != nil {
-		common.SendResponse(ctx, err, "")
+		common.SendResponse(ctx, err, commentVO)
 		return
 	}
-	common.SendResponse(ctx, common.OK, "")
+
+	//查询添加的评论，返回评论Id
+	commentVO.CommentId = cid
+	common.SendResponse(ctx, common.OK, commentVO)
 }
 
 //Delete
@@ -96,7 +125,7 @@ func (c Comment) Add(ctx *gin.Context) {
 * @Author: ethan.chen@cpgroup.cn
 * @Date: 2021/10/11 15:10
 * @Description: 删除评论（及附属回复）
-* @Params:
+* @Params: DeleteCommentQO
 * @Return:
 **/
 func (c Comment) Delete(ctx *gin.Context) {
@@ -107,9 +136,7 @@ func (c Comment) Delete(ctx *gin.Context) {
 	var commentReply []model.CommentReply
 
 	//查询评论状态，已删除/不存在则直接返回
-	globalInit.Db.Model(&model.Comment{}).
-		Where("cid = ? and state = ?", deleteQO.CommentId, cpgConst.ONE).
-		First(comment)
+	comment = c.commentInfo(deleteQO.CommentId)
 	if reflect.DeepEqual(model.Comment{}, comment) {
 		e := common.ErrParam
 		e.Message = "comment not exist or was deleted"
@@ -164,7 +191,35 @@ func (c Comment) Delete(ctx *gin.Context) {
 * @Params:
 * @Return:
 **/
-func (c Comment) AddReply(ctx *gin.Context) {}
+func (c Comment) AddReply(ctx *gin.Context) {
+	replyQO := qo.AddCommentReplyQO{}
+	util.JsonConvert(ctx, replyQO)
+	replyVO := vo.AddCommentReplyVO{}
+	token, _ := c.tokenInfo(ctx)
+	uid, _ := strconv.Atoi(token.Uid)
+
+	//查询评论状态（如果非上线状态则不允许进行回复）
+	comment := model.Comment{}
+	globalInit.Db.Model(model.Comment{}).
+		Where("id = ?, state = ?", replyQO.CommentId, cpgConst.ZERO).Find(&comment)
+	if reflect.DeepEqual(model.Comment{}, comment) {
+		common.SendResponse(ctx, common.ErrParam, replyVO)
+	}
+
+	//添加回复
+	reply := dao.CommentReplyDao{}
+	reply.Cid = uint(replyQO.CommentId)
+	reply.UID = uint(uid)
+	reply.Content = replyQO.Content
+	//TODO 后续增加审核功能
+	reply.State = cpgConst.ZERO
+	replyId, err := reply.CreateCommentReply(ctx)
+	if err != nil {
+		common.SendResponse(ctx, err, replyVO)
+		return
+	}
+	common.SendResponse(ctx, common.OK, replyId)
+}
 
 //DeleteReply
 /**
