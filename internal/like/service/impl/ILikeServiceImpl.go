@@ -4,7 +4,8 @@ import (
 	"cpg-blog/global/common"
 	"cpg-blog/global/cpgConst"
 	model2 "cpg-blog/internal/article/model"
-	"cpg-blog/internal/article/service"
+	article "cpg-blog/internal/article/service"
+	comment "cpg-blog/internal/comment/service"
 	"cpg-blog/internal/like/model"
 	"cpg-blog/internal/like/model/dao"
 	"cpg-blog/internal/like/qo"
@@ -20,7 +21,10 @@ var (
 	zero64 = int64(zero)
 )
 
-var articleService service.IArticle
+var (
+	articleService article.IArticle
+	commentService comment.IComment
+)
 
 type Like struct{}
 
@@ -130,16 +134,24 @@ func cancelLikeArticle(sn int64, uid int) (err error) {
 }
 
 func likeComment(commentId int, uid int) (err error) {
-	//TODO 查询comment是否存在
-	//TODO 点赞表增加记录
-	//TODO 评论表增加点赞数
+	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
+	err = commentService.UpdateCommentZan(commentId, true)
+	if err != nil {
+		return
+	}
+
+	//点赞表更新记录
 	return dao.LikeDAO{}.CreatOrUpdate(uid, cpgConst.ONE, int64(commentId), false)
 }
 
 func cancelLikeComment(commentId int, uid int) (err error) {
-	//TODO 查询comment是否存在
-	//TODO 点赞表更改记录
-	//TODO 评论表减少点赞数
+	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
+	err = commentService.UpdateCommentZan(commentId, false)
+	if err != nil {
+		return
+	}
+
+	//点赞表更改记录
 	return dao.LikeDAO{}.CreatOrUpdate(uid, cpgConst.ONE, int64(commentId), true)
 }
 

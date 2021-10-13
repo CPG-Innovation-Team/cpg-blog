@@ -73,3 +73,19 @@ func (c CommentDao) UpdateComment(ctx *gin.Context) (err error) {
 	}(tx)
 	return
 }
+
+func (c CommentDao) UpdateCommentZan(cid int, add int) (err error) {
+	c.Cid = uint(cid)
+	tx := globalInit.Transaction()
+	e := common.ErrDatabase
+	err = func(db *gorm.DB) error {
+		tx.Model(&c).Update("zan_num", add)
+		tx.Commit()
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+		return nil
+	}(tx)
+	return
+}
