@@ -2,7 +2,7 @@ package service
 
 import "github.com/gin-gonic/gin"
 
-type Comment interface {
+type IComment interface {
 	// List 文章所有评论及关系
 	List(ctx *gin.Context)
 
@@ -17,4 +17,7 @@ type Comment interface {
 
 	// DeleteReply 删除回复
 	DeleteReply(ctx *gin.Context)
+
+	// UpdateCommentZan 服务间更新点赞信息
+	UpdateCommentZan(cid int, isAdd bool) (err error)
 }

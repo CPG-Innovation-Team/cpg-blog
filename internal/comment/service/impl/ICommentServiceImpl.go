@@ -52,6 +52,37 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 	return jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 }
 
+//UpdateCommentZan
+/**
+* @Author: ethan.chen@cpgroup.cn
+* @Date: 2021/10/13 15:22
+* @Description: 其他服务更新评论点赞信息
+* @Params: cid int, isAdd bool
+* @Return: error
+**/
+func (c Comment) UpdateCommentZan(cid int, isAdd bool) (err error) {
+	comment := model.Comment{}
+	globalInit.Db.Where("cid = ? and state = ?", cid, cpgConst.ONE).Find(&comment)
+
+	if reflect.DeepEqual(model.Comment{}, comment) {
+		e := common.ErrParam
+		e.Message = "Not Find Comment Or Comment Not Online"
+		return e
+	}
+	if !isAdd && comment.ZanNum == cpgConst.ZERO {
+		return nil
+	}
+
+	zanNum := comment.ZanNum
+	if isAdd {
+		zanNum += cpgConst.ONE
+	} else {
+		zanNum -= cpgConst.ONE
+	}
+
+	return dao.CommentDao{}.UpdateCommentZan(cid, zanNum)
+}
+
 //List
 /**
 * @Author: ethan.chen@cpgroup.cn
@@ -62,29 +93,29 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 **/
 func (c Comment) List(ctx *gin.Context) {
 	listQO := qo.ListQO{}
-	util.JsonConvert(ctx,listQO)
-	listMap:= map[int]vo.CommentListVO{}
+	util.JsonConvert(ctx, listQO)
+	listMap := map[int]vo.CommentListVO{}
 
 	//通过sn查询文章所有评论，生成以floor为key,listVO为value
 	var comments []model.Comment
-	globalInit.Db.Model(model.Comment{}).Where("sn",listQO.Sn).Find(&comments)
-	if len(comments) ==0{
-		common.SendResponse(ctx,common.OK,listMap)
+	globalInit.Db.Model(model.Comment{}).Where("sn", listQO.Sn).Find(&comments)
+	if len(comments) == 0 {
+		common.SendResponse(ctx, common.OK, listMap)
 		return
 	}
 
-	for _,v:=range comments{
-		_ = copier.Copy(listMap[v.Floor],v)
+	for _, v := range comments {
+		_ = copier.Copy(listMap[v.Floor], v)
 
 		//根据cid查询comment下所有的回复
 		var replies []model.CommentReply
 		var replyList []vo.ReplyVO
-		globalInit.Db.Model(model.CommentReply{}).Where("cid",v.Cid).Find(&replies)
-		_ = copier.Copy(replyList,replies)
+		globalInit.Db.Model(model.CommentReply{}).Where("cid", v.Cid).Find(&replies)
+		_ = copier.Copy(replyList, replies)
 		copy(listMap[v.Floor].ReplyList, replyList)
 	}
 
-	common.SendResponse(ctx,common.OK,listMap)
+	common.SendResponse(ctx, common.OK, listMap)
 }
 
 //Add
@@ -265,7 +296,7 @@ func (c Comment) AddReply(ctx *gin.Context) {
 **/
 func (c Comment) DeleteReply(ctx *gin.Context) {
 	deleteQO := qo.DeleteCommentReplyQO{}
-	util.JsonConvert(ctx,deleteQO)
+	util.JsonConvert(ctx, deleteQO)
 
 	err := dao.CommentReplyDao{Id: uint(deleteQO.Id), State: cpgConst.THREE}.DeleteCommentReplyById(ctx)
 	if err != nil {
@@ -274,5 +305,5 @@ func (c Comment) DeleteReply(ctx *gin.Context) {
 		common.SendResponse(ctx, e, "")
 		return
 	}
-	common.SendResponse(ctx,common.OK,"")
+	common.SendResponse(ctx, common.OK, "")
 }
