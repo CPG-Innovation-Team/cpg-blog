@@ -20,6 +20,7 @@ func RegisterSpecialRoutes(g *gin.RouterGroup) {
 // RegisterPortalRoutes 统一注册portal路由
 func RegisterPortalRoutes(g *gin.RouterGroup)  {
 	IRegisterRoute.RegisterRoute(new(like.Controller), g)
+	IRegisterRoute.RegisterRoute(new(comment.Controller),g)
 }
 
 // RegisterRoutes 统一注册admin路由
@@ -27,5 +28,4 @@ func RegisterRoutes(g *gin.RouterGroup) {
 	IRegisterRoute.RegisterRoute(new(user.Controller), g)
 	IRegisterRoute.RegisterRoute(new(article.Controller), g)
 	IRegisterRoute.RegisterRoute(new(auth.Controller), g)
-	IRegisterRoute.RegisterRoute(new(comment.Controller),g)
 }

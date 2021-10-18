@@ -4,28 +4,23 @@ import (
 	"cpg-blog/global/common"
 	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
-	Article "cpg-blog/internal/article/service"
 	"cpg-blog/internal/comment/model"
 	"cpg-blog/internal/comment/model/dao"
 	"cpg-blog/internal/comment/qo"
 	"cpg-blog/internal/comment/vo"
-	Like "cpg-blog/internal/like/service"
-	User "cpg-blog/internal/user/service"
 	"cpg-blog/middleware/jwt"
+	"cpg-blog/pkg/commonFunc/articleCommonFunc"
+	"cpg-blog/pkg/commonFunc/likeCommonFunc"
+	"cpg-blog/pkg/commonFunc/userCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"log"
 	"reflect"
 	"strconv"
 )
 
 type Comment struct{}
-
-var (
-	userService    User.IUser
-	articleService Article.IArticle
-	likeService    Like.ILike
-)
 
 /**
 * @Author: ethan.chen@cpgroup.cn
@@ -37,7 +32,7 @@ var (
 func (c Comment) commentInfo(cid int) (comment model.Comment) {
 	globalInit.Db.Model(&model.Comment{}).
 		Where("cid = ? and state = ?", cid, cpgConst.ONE).
-		First(comment)
+		First(&comment)
 	return
 }
 
@@ -60,28 +55,28 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 * @Params: cid int, isAdd bool
 * @Return: error
 **/
-func (c Comment) UpdateCommentZan(cid int, isAdd bool) (err error) {
-	comment := model.Comment{}
-	globalInit.Db.Where("cid = ? and state = ?", cid, cpgConst.ONE).Find(&comment)
-
-	if reflect.DeepEqual(model.Comment{}, comment) {
-		e := common.ErrParam
-		e.Message = "Not Find Comment Or Comment Not Online"
-		return e
-	}
-	if !isAdd && comment.ZanNum == cpgConst.ZERO {
-		return nil
-	}
-
-	zanNum := comment.ZanNum
-	if isAdd {
-		zanNum += cpgConst.ONE
-	} else {
-		zanNum -= cpgConst.ONE
-	}
-
-	return dao.CommentDao{}.UpdateCommentZan(cid, zanNum)
-}
+//func (c Comment) UpdateCommentZan(cid int, isAdd bool) (err error) {
+//	comment := model.Comment{}
+//	globalInit.Db.Where("cid = ? and state = ?", cid, cpgConst.ONE).Find(&comment)
+//
+//	if reflect.DeepEqual(model.Comment{}, comment) {
+//		e := common.ErrParam
+//		e.Message = "Not Find Comment Or Comment Not Online"
+//		return e
+//	}
+//	if !isAdd && comment.ZanNum == cpgConst.ZERO {
+//		return nil
+//	}
+//
+//	zanNum := comment.ZanNum
+//	if isAdd {
+//		zanNum += cpgConst.ONE
+//	} else {
+//		zanNum -= cpgConst.ONE
+//	}
+//
+//	return dao.Comment{}.UpdateCommentZan(cid, zanNum)
+//}
 
 //List
 /**
@@ -127,7 +122,7 @@ func (c Comment) List(ctx *gin.Context) {
 * @Return:
 **/
 func (c Comment) Add(ctx *gin.Context) {
-	var comment dao.CommentDao
+	var comment dao.Comment
 	claims, _ := c.tokenInfo(ctx)
 	uid, _ := strconv.Atoi(claims.Uid)
 	comment.UID = uint(uid)
@@ -142,14 +137,15 @@ func (c Comment) Add(ctx *gin.Context) {
 	}
 
 	//查询用户是否存在
-	user := userService.FindUser(ctx, []int{int(comment.UID)}, "", "")
+	user := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{int(comment.UID)}, "", "")
 	if userInfo, ok := user[comment.UID]; !ok || int(userInfo.State) != cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrUserNotFound, commentVO)
 		return
 	}
 
 	//查询文章是否存在
-	articleMap := articleService.FindArticles(ctx, []int64{addQO.Sn})
+	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		FindArticles(ctx, []int64{addQO.Sn})
 	if article, ok := articleMap[addQO.Sn]; !ok || article.State != cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, commentVO)
 		return
@@ -161,19 +157,15 @@ func (c Comment) Add(ctx *gin.Context) {
 		Select("floor").
 		Where("sn", addQO.Sn).
 		Order("floor desc").
-		First(floor)
+		First(&floor)
 
 	//插入评论
 	//TODO 后续增加审核功能
 	comment.State = cpgConst.ONE
 	comment.Sn = addQO.Sn
 	comment.Content = addQO.Content
-	if floor == cpgConst.ZERO {
-		comment.Floor = floor
-	}
-	if floor > cpgConst.ZERO {
-		comment.Floor = floor + cpgConst.ONE
-	}
+	comment.Floor = floor + cpgConst.ONE
+
 	cid, err := comment.CreateComment(ctx)
 	if err != nil {
 		common.SendResponse(ctx, err, commentVO)
@@ -182,6 +174,15 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//查询添加的评论，返回评论Id
 	commentVO.CommentId = cid
+
+	//更新文章扩展表评论数
+	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		UpdateArticleEx(ctx,addQO.Sn,false,true,false,true)
+	if err != nil {
+		common.SendResponse(ctx, err, commentVO)
+		return
+	}
+
 	common.SendResponse(ctx, common.OK, commentVO)
 }
 
@@ -195,7 +196,7 @@ func (c Comment) Add(ctx *gin.Context) {
 **/
 func (c Comment) Delete(ctx *gin.Context) {
 	deleteQO := qo.DeleteCommentQO{}
-	util.JsonConvert(ctx, deleteQO)
+	util.JsonConvert(ctx, &deleteQO)
 
 	comment := model.Comment{}
 	var commentReply []model.CommentReply
@@ -212,11 +213,13 @@ func (c Comment) Delete(ctx *gin.Context) {
 	//查询评论是否存在回复，存在则先删除回复
 	globalInit.Db.Model(&model.CommentReply{}).
 		Where("cid = ? and state = ?", comment.Cid, cpgConst.ONE).
-		Find(commentReply)
+		Find(&commentReply)
 
 	if !reflect.DeepEqual([]model.CommentReply{}, commentReply) {
 		//删除该Cid下所有回复
-		err := dao.CommentReplyDao{Cid: comment.Cid, State: cpgConst.THREE}.UpdateCommentReplyByCid(ctx)
+		log.Println(comment.Content)
+		err := dao.CommentReplyDao{Cid: comment.Cid, Content: comment.Content, State: cpgConst.THREE}.
+			UpdateCommentReplyByCid(ctx)
 		if err != nil {
 			common.SendResponse(ctx, err, "")
 			return
@@ -224,14 +227,16 @@ func (c Comment) Delete(ctx *gin.Context) {
 	}
 
 	//更新评论状态为删除
-	err := dao.CommentDao{Cid: comment.Cid, State: cpgConst.THREE}.UpdateComment(ctx)
+	err := dao.Comment{Cid: comment.Cid, Content: comment.Content, State: cpgConst.THREE}.
+		UpdateComment(ctx)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return
 	}
 
 	//文章扩展表文章评论数更改
-	err = articleService.UpdateArticleEx(ctx, comment.Sn, false, true, false, false)
+	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		UpdateArticleEx(ctx, comment.Sn, false, true, false, false)
 	if err != nil {
 		e := common.ErrDatabase
 		e.Message = err.Error()
@@ -240,7 +245,8 @@ func (c Comment) Delete(ctx *gin.Context) {
 	}
 
 	//点赞表更改评论点赞状态
-	err = likeService.Update(ctx, comment.Sn, cpgConst.ONE)
+	err = likeCommonFunc.ILike(likeCommonFunc.LikeCommonFunc{}).
+		UpdateZanSate(ctx, comment.Sn, cpgConst.ONE)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return

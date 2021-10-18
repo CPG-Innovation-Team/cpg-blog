@@ -4,12 +4,12 @@ import (
 	"cpg-blog/global/common"
 	"cpg-blog/global/cpgConst"
 	model2 "cpg-blog/internal/article/model"
-	article "cpg-blog/internal/article/service"
-	comment "cpg-blog/internal/comment/service"
 	"cpg-blog/internal/like/model"
 	"cpg-blog/internal/like/model/dao"
 	"cpg-blog/internal/like/qo"
 	"cpg-blog/middleware/jwt"
+	"cpg-blog/pkg/commonFunc/articleCommonFunc"
+	"cpg-blog/pkg/commonFunc/commentCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"reflect"
@@ -19,11 +19,6 @@ import (
 var (
 	zero   = cpgConst.ZERO
 	zero64 = int64(zero)
-)
-
-var (
-	articleService article.IArticle
-	commentService comment.IComment
 )
 
 type Like struct{}
@@ -78,9 +73,10 @@ func isLike(ctx *gin.Context, isCancelLike bool) (e error) {
 
 func likeArticle(sn int64, uid int) (err error) {
 	//查询文章是否存在,且已上线
-	articleMap := articleService.FindArticles(&gin.Context{}, []int64{sn})
-	article := articleMap[sn]
-	if reflect.DeepEqual(model2.Article{}, article) {
+	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		FindArticles(&gin.Context{}, []int64{sn})
+	articleDetail := articleMap[sn]
+	if reflect.DeepEqual(model2.Article{}, articleDetail) {
 		e := common.ErrParam
 		e.Message = "Invalid Param Or Article State is not Published."
 		return e
@@ -97,13 +93,15 @@ func likeArticle(sn int64, uid int) (err error) {
 	}
 
 	//文章扩展表更新
-	err = articleService.UpdateArticleEx(&gin.Context{}, sn, false, false, true, true)
+	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		UpdateArticleEx(&gin.Context{}, sn, false, false, true, true)
 	return
 }
 
 func cancelLikeArticle(sn int64, uid int) (err error) {
 	//查询文章是否存在,且已上线
-	articleMap := articleService.FindArticles(&gin.Context{}, []int64{sn})
+	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		FindArticles(&gin.Context{}, []int64{sn})
 	article := articleMap[sn]
 	if reflect.DeepEqual(model2.Article{}, article) {
 		e := common.ErrParam
@@ -129,13 +127,15 @@ func cancelLikeArticle(sn int64, uid int) (err error) {
 	}
 
 	//文章扩展表更新
-	err = articleService.UpdateArticleEx(&gin.Context{}, sn, false, false, true, false)
+	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
+		UpdateArticleEx(&gin.Context{}, sn, false, false, true, false)
 	return
 }
 
 func likeComment(commentId int, uid int) (err error) {
 	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
-	err = commentService.UpdateCommentZan(commentId, true)
+	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}.Get()).
+		UpdateCommentZan(commentId, true)
 	if err != nil {
 		return
 	}
@@ -146,7 +146,7 @@ func likeComment(commentId int, uid int) (err error) {
 
 func cancelLikeComment(commentId int, uid int) (err error) {
 	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
-	err = commentService.UpdateCommentZan(commentId, false)
+	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}.Get()).UpdateCommentZan(commentId, false)
 	if err != nil {
 		return
 	}
@@ -156,19 +156,21 @@ func cancelLikeComment(commentId int, uid int) (err error) {
 }
 
 func (l Like) Like(ctx *gin.Context) {
+	//TODO 判断用户是否存在
 	common.SendResponse(ctx, isLike(ctx, false), "")
 }
 
 func (l Like) CancelLike(ctx *gin.Context) {
+	//TODO 判断用户是否存在
 	common.SendResponse(ctx, isLike(ctx, true), "")
 }
 
-func (l Like) Update(ctx *gin.Context, objId int64, state int) (err error) {
-	err = dao.LikeDAO{}.Update(ctx, objId, state)
-	if err == nil {
-		return common.OK
-	}
-	e := common.ErrDatabase
-	e.Message = err.Error()
-	return e
-}
+//func (l Like) Update(ctx *gin.Context, objId int64, state int) (err error) {
+//	err = dao.LikeDAO{}.Update(ctx, objId, state)
+//	if err == nil {
+//		return common.OK
+//	}
+//	e := common.ErrDatabase
+//	e.Message = err.Error()
+//	return e
+//}
