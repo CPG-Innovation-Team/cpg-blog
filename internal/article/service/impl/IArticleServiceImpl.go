@@ -10,6 +10,7 @@ import (
 	"cpg-blog/internal/article/vo"
 	"cpg-blog/internal/user/service"
 	"cpg-blog/middleware/jwt"
+	"cpg-blog/pkg/commonFunc/userCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -41,26 +42,25 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	return
 }
 
-func (a Article) FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
-	var articles []model.Article
-	articles = []model.Article{}
-	articlesMap = map[int64]model.Article{}
-
-	tx := globalInit.Db.WithContext(ctx).Model(&model.Article{})
-	if len(sn) == cpgConst.ONE {
-		tx.Where("sn", sn[0])
-	}
-
-	if len(sn) > cpgConst.ZERO {
-		tx.Where("sn In", sn)
-	}
-	tx.Where("state", cpgConst.ONE).Find(articles)
-
-	for _, v := range articles {
-		articlesMap[v.Sn] = v
-	}
-	return articlesMap
-}
+//func (a Article) FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
+//	var articles []model.Article
+//	articles = []model.Article{}
+//	articlesMap = map[int64]model.Article{}
+//
+//	tx := globalInit.Db.WithContext(ctx).Model(&model.Article{})
+//	if len(sn) == cpgConst.ONE {
+//		tx.Where("sn", sn[0])
+//	}
+//
+//	if len(sn) > cpgConst.ONE {
+//		tx.Where("sn In", sn)
+//	}
+//	tx.Where("state", cpgConst.ONE).Find(&articles)
+//	for _, v := range articles {
+//		articlesMap[v.Sn] = v
+//	}
+//	return articlesMap
+//}
 
 // Info 根据sn查询
 func (a Article) Info(ctx *gin.Context) {
@@ -82,7 +82,8 @@ func (a Article) Info(ctx *gin.Context) {
 	if err := copier.Copy(&articleVO, article); err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
 	}
-	userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
+	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
+	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
 	articleVO.Author = userMap[uint(article.Uid)].UserName
 	articleVO.CreateAt = article.CreatedAt.Unix()
 	articleVO.UpdatedAt = article.UpdatedAt.Unix()
@@ -110,7 +111,8 @@ func (a Article) List(ctx *gin.Context) {
 		articleVO := articleDAO.FindArticles(ctx)
 
 		//通过uid查询名称并填充
-		userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
+		//userMap := userService.FindUser(ctx, []int{articleDAO.Uid}, "", "")
+		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{articleDAO.Uid}, "", "")
 		articleList := articleVO.ArticleDetailList
 		for k, v := range articleVO.ArticleDetailList {
 			articleList[k].Author = userMap[v.Uid].UserName
@@ -122,7 +124,8 @@ func (a Article) List(ctx *gin.Context) {
 	articleVO := articleDAO.FindArticles(ctx)
 	articleList := articleVO.ArticleDetailList
 	for k, v := range articleList {
-		userMap := userService.FindUser(ctx, []int{int(v.Uid)}, "", "")
+		//userMap := userService.FindUser(ctx, []int{int(v.Uid)}, "", "")
+		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{int(v.Uid)}, "", "")
 		articleList[k].Author = userMap[v.Uid].UserName
 	}
 	common.SendResponse(ctx, common.OK, articleVO)
@@ -233,6 +236,6 @@ func (a Article) Update(ctx *gin.Context) {
 	common.SendResponse(ctx, common.OK, "")
 }
 
-func (a Article) UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error {
-	return dao.ArticleDAO{}.UpdateArticleEx(sn, view, cmt, zan, add)
-}
+//func (a Article) UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error {
+//	return dao.ArticleDAO{}.UpdateArticleEx(sn, view, cmt, zan, add)
+//}

@@ -56,10 +56,16 @@ func (d LikeDAO) CreatOrUpdate(uid int, objType int, objId int64, cancelLike boo
 	return err
 }
 
-func (d LikeDAO) Update(ctx *gin.Context, objId int64, state int) (err error) {
+func (d LikeDAO) UpdateZanSate(ctx *gin.Context, objId int64, state int) (err error) {
+	var zanInfo model.Zan
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
-		tx.Where("obj_id", objId).Update("state", state)
+		tx.Model(model.Zan{}).Where("obj_id", objId).Find(&zanInfo)
+		if zanInfo.State == state{
+			return nil
+		}
+
+		tx.Model(model.Zan{}).Where("obj_id", objId).Update("state", state)
 		if tx.Error != nil {
 			tx.Rollback()
 			return tx.Error

@@ -14,11 +14,11 @@ import (
   @description:评论表
 **/
 
-type CommentDao model.Comment
+type Comment model.Comment
 
 var Db = &(globalInit.Db)
 
-func (c CommentDao) BeforeCreate(tx *gorm.DB) (err error) {
+func (c Comment) BeforeCreate(tx *gorm.DB) (err error) {
 	result := tx.Find(&c)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -26,7 +26,7 @@ func (c CommentDao) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (c CommentDao) BeforeUpdate(tx *gorm.DB) (err error) {
+func (c Comment) BeforeUpdate(tx *gorm.DB) (err error) {
 	result := tx.Find(&c)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -34,11 +34,11 @@ func (c CommentDao) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (c CommentDao) CreateComment(ctx *gin.Context) (cid uint, err error) {
+func (c Comment) CreateComment(ctx *gin.Context) (cid uint, err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Create(c)
+		tx.Create(&c)
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
 			return e
@@ -54,11 +54,11 @@ func (c CommentDao) CreateComment(ctx *gin.Context) (cid uint, err error) {
 	return c.Cid, err
 }
 
-func (c CommentDao) UpdateComment(ctx *gin.Context) (err error) {
+func (c Comment) UpdateComment(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Select("content", "zan_num", "state").Updates(c)
+		tx.Select("content", "zan_num", "state").Updates(&c)
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
 			return e
@@ -74,7 +74,7 @@ func (c CommentDao) UpdateComment(ctx *gin.Context) (err error) {
 	return
 }
 
-func (c CommentDao) UpdateCommentZan(cid int, add int) (err error) {
+func (c Comment) UpdateCommentZan(cid int, add int) (err error) {
 	c.Cid = uint(cid)
 	tx := globalInit.Transaction()
 	e := common.ErrDatabase

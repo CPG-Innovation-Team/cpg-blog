@@ -85,19 +85,19 @@ func (u Users) decryption(storePasswd, passwd string) (err error) {
 }
 
 // FindUser 根据条件查询用户
-func (u Users) FindUser(ctx *gin.Context, uidList []int, name string, email string) (users map[uint]model.User) {
-	findQO := &dao.UserDAO{
-		UId:   uidList,
-		Name:  name,
-		Email: email,
-	}
-	userList := findQO.GetUser(ctx)
-	users = map[uint]model.User{}
-	for _, v := range *userList {
-		users[v.UID] = v
-	}
-	return users
-}
+//func (u Users) FindUser(ctx *gin.Context, uidList []int, name string, email string) (users map[uint]model.User) {
+//	findQO := &dao.UserDAO{
+//		UId:   uidList,
+//		Name:  name,
+//		Email: email,
+//	}
+//	userList := findQO.GetUser(ctx)
+//	users = map[uint]model.User{}
+//	for _, v := range *userList {
+//		users[v.UID] = v
+//	}
+//	return users
+//}
 
 func (u *Users) Login(ctx *gin.Context) {
 	loginQo := qo.LoginQO{}

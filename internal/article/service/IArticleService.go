@@ -1,7 +1,6 @@
 package service
 
 import (
-	"cpg-blog/internal/article/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,8 +21,8 @@ type IArticle interface {
 	Update(ctx *gin.Context)
 
 	// UpdateArticleEx 服务间更新文章扩展信息
-	UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error
+	//UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error
 
 	// FindArticles 服务间查询文章信息，支持list
-	FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
+	//FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
 }
