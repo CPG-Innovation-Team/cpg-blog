@@ -15,7 +15,6 @@ import (
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	"log"
 	"reflect"
 	"strconv"
 )
@@ -177,7 +176,7 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//更新文章扩展表评论数
 	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		UpdateArticleEx(ctx,addQO.Sn,false,true,false,true)
+		UpdateArticleEx(ctx, addQO.Sn, false, true, false, true)
 	if err != nil {
 		common.SendResponse(ctx, err, commentVO)
 		return
@@ -217,8 +216,7 @@ func (c Comment) Delete(ctx *gin.Context) {
 
 	if !reflect.DeepEqual([]model.CommentReply{}, commentReply) {
 		//删除该Cid下所有回复
-		log.Println(comment.Content)
-		err := dao.CommentReplyDao{Cid: comment.Cid, Content: comment.Content, State: cpgConst.THREE}.
+		err := dao.CommentReply{Cid: comment.Cid, State: cpgConst.THREE}.
 			UpdateCommentReplyByCid(ctx)
 		if err != nil {
 			common.SendResponse(ctx, err, "")
@@ -264,7 +262,7 @@ func (c Comment) Delete(ctx *gin.Context) {
 **/
 func (c Comment) AddReply(ctx *gin.Context) {
 	replyQO := qo.AddCommentReplyQO{}
-	util.JsonConvert(ctx, replyQO)
+	util.JsonConvert(ctx, &replyQO)
 	replyVO := vo.AddCommentReplyVO{}
 	token, _ := c.tokenInfo(ctx)
 	uid, _ := strconv.Atoi(token.Uid)
@@ -272,18 +270,19 @@ func (c Comment) AddReply(ctx *gin.Context) {
 	//查询评论状态（如果非上线状态则不允许进行回复）
 	comment := model.Comment{}
 	globalInit.Db.Model(model.Comment{}).
-		Where("id = ?, state = ?", replyQO.CommentId, cpgConst.ZERO).Find(&comment)
+		Where("cid = ? and state = ?", replyQO.CommentId, cpgConst.ONE).Find(&comment)
 	if reflect.DeepEqual(model.Comment{}, comment) {
 		common.SendResponse(ctx, common.ErrParam, replyVO)
+		return
 	}
 
 	//添加回复
-	reply := dao.CommentReplyDao{}
+	reply := dao.CommentReply{}
 	reply.Cid = uint(replyQO.CommentId)
 	reply.UID = uint(uid)
 	reply.Content = replyQO.Content
 	//TODO 后续增加审核功能
-	reply.State = cpgConst.ZERO
+	reply.State = cpgConst.ONE
 	replyId, err := reply.CreateCommentReply(ctx)
 	if err != nil {
 		common.SendResponse(ctx, err, replyVO)
@@ -302,9 +301,9 @@ func (c Comment) AddReply(ctx *gin.Context) {
 **/
 func (c Comment) DeleteReply(ctx *gin.Context) {
 	deleteQO := qo.DeleteCommentReplyQO{}
-	util.JsonConvert(ctx, deleteQO)
+	util.JsonConvert(ctx, &deleteQO)
 
-	err := dao.CommentReplyDao{Id: uint(deleteQO.Id), State: cpgConst.THREE}.DeleteCommentReplyById(ctx)
+	err := dao.CommentReply{Id: uint(deleteQO.Id), State: cpgConst.THREE}.DeleteCommentReplyById(ctx)
 	if err != nil {
 		e := common.ErrDatabase
 		e.Message = err.Error()

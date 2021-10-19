@@ -134,7 +134,7 @@ func cancelLikeArticle(sn int64, uid int) (err error) {
 
 func likeComment(commentId int, uid int) (err error) {
 	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
-	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}.Get()).
+	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}).
 		UpdateCommentZan(commentId, true)
 	if err != nil {
 		return
@@ -146,7 +146,7 @@ func likeComment(commentId int, uid int) (err error) {
 
 func cancelLikeComment(commentId int, uid int) (err error) {
 	//查询comment是否存在或处于上线状态,并更新评论表点赞数量
-	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}.Get()).UpdateCommentZan(commentId, false)
+	err = commentCommonFunc.IComment(commentCommonFunc.CommentCommonFunc{}).UpdateCommentZan(commentId, false)
 	if err != nil {
 		return
 	}

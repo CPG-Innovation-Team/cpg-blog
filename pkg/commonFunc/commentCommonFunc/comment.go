@@ -22,10 +22,6 @@ type IComment interface {
 
 type CommentCommonFunc struct{}
 
-func (c CommentCommonFunc) Get() *CommentCommonFunc {
-	return new(CommentCommonFunc)
-}
-
 func (c CommentCommonFunc)UpdateCommentZan(cid int, isAdd bool) (err error) {
 	comment := model.Comment{}
 	globalInit.Db.Where("cid = ? and state = ?", cid, cpgConst.ONE).Find(&comment)
