@@ -87,8 +87,8 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 **/
 func (c Comment) List(ctx *gin.Context) {
 	listQO := qo.ListQO{}
-	util.JsonConvert(ctx, listQO)
-	listMap := map[int]vo.CommentListVO{}
+	util.JsonConvert(ctx, &listQO)
+	listMap := make(map[int]vo.CommentListVO)
 
 	//通过sn查询文章所有评论，生成以floor为key,listVO为value
 	var comments []model.Comment
@@ -99,14 +99,13 @@ func (c Comment) List(ctx *gin.Context) {
 	}
 
 	for _, v := range comments {
-		_ = copier.Copy(listMap[v.Floor], v)
+		commentInfo := listMap[v.Floor]
+		_ = copier.Copy(&commentInfo, &v)
 
 		//根据cid查询comment下所有的回复
-		var replies []model.CommentReply
-		var replyList []vo.ReplyVO
-		globalInit.Db.Model(model.CommentReply{}).Where("cid", v.Cid).Find(&replies)
-		_ = copier.Copy(replyList, replies)
-		copy(listMap[v.Floor].ReplyList, replyList)
+		globalInit.Db.Model(model.CommentReply{}).Where("cid = ? and state = ?", v.Cid, cpgConst.ONE).Find(&commentInfo.ReplyList)
+
+		listMap[v.Floor] = commentInfo
 	}
 
 	common.SendResponse(ctx, common.OK, listMap)
