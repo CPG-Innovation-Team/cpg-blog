@@ -14,7 +14,7 @@ import (
   @description:评论回复表
 **/
 
-type CommentReplyDao model.CommentReply
+type CommentReply model.CommentReply
 
 //UpdateCommentReplyByCid
 /**
@@ -25,7 +25,7 @@ type CommentReplyDao model.CommentReply
 * @Return: error
 **/
 
-func (c CommentReplyDao) BeforeCreate(tx *gorm.DB) (err error) {
+func (c CommentReply) BeforeCreate(tx *gorm.DB) (err error) {
 	result := tx.Find(&c)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -33,7 +33,7 @@ func (c CommentReplyDao) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (c CommentReplyDao) BeforeUpdate(tx *gorm.DB) (err error) {
+func (c CommentReply) BeforeUpdate(tx *gorm.DB) (err error) {
 	result := tx.Find(&c)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -41,12 +41,12 @@ func (c CommentReplyDao) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (c CommentReplyDao) UpdateCommentReplyByCid(ctx *gin.Context) (err error) {
+func (c CommentReply) UpdateCommentReplyByCid(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	tx.Model(c)
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Select("content", "state").Where("cid", c.Cid).Updates(&c)
+		tx.Select( "state").Where("cid", c.Cid).Updates(&c)
 
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
@@ -63,11 +63,11 @@ func (c CommentReplyDao) UpdateCommentReplyByCid(ctx *gin.Context) (err error) {
 	return
 }
 
-func (c CommentReplyDao) CreateCommentReply(ctx *gin.Context) (replyId uint, err error) {
+func (c CommentReply) CreateCommentReply(ctx *gin.Context) (replyId uint, err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Create(c)
+		tx.Create(&c)
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
 			return e
@@ -83,12 +83,18 @@ func (c CommentReplyDao) CreateCommentReply(ctx *gin.Context) (replyId uint, err
 	return c.Id, err
 }
 
-func (c CommentReplyDao) DeleteCommentReplyById(ctx *gin.Context) (err error) {
+func (c CommentReply) DeleteCommentReplyById(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
-	tx.Model(c)
+	tx.Model(&c)
+	reply := CommentReply{}
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Select("state").Where("id", c.Id).Updates(c)
+		tx = tx.Select("state").Where("id", c.Id).Find(&reply)
+		if reply.State == c.State{
+			return nil
+		}
+
+		tx.Updates(c)
 
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
