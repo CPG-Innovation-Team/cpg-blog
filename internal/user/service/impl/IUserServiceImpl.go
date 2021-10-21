@@ -2,6 +2,7 @@ package impl
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/user/model"
 	"cpg-blog/internal/user/model/dao"
@@ -59,13 +60,13 @@ func genToken(info tokenInfo) (token string, err error) {
 }
 
 //token添加进入redis
-func addTokenToRedis(ctx *gin.Context,token string) (err error) {
+func addTokenToRedis(ctx *gin.Context, token string) (err error) {
 	_, err = globalInit.RedisClient.SAdd(ctx, "token", token).Result()
 	return err
 }
 
 //redis移除对应token
-func removeTokenFromRedis(ctx *gin.Context,token string)  (err error){
+func removeTokenFromRedis(ctx *gin.Context, token string) (err error) {
 	_, err = globalInit.RedisClient.SRem(ctx, "token", token).Result()
 	return err
 }
@@ -79,8 +80,8 @@ func (u Users) encryption(passwd string) (string, error) {
 	return string(store), nil
 }
 
-//解密
-func (u Users) decryption(storePasswd, passwd string) (err error) {
+//校验密码
+func (u Users) comparePwd(storePasswd, passwd string) (err error) {
 	return bcrypt.CompareHashAndPassword([]byte(storePasswd), []byte(passwd))
 }
 
@@ -110,6 +111,10 @@ func (u *Users) Login(ctx *gin.Context) {
 	if users[0].Passwd != loginQo.Passwd {
 		common.SendResponse(ctx, common.ErrPasswordIncorrect, "")
 	}
+
+	if u.comparePwd(users[0].Passwd, loginQo.Passwd) != nil {
+		common.SendResponse(ctx, common.ErrPasswordIncorrect, "")
+	}
 	//生成token
 	tokenInfo := tokenInfo{
 		int(users[0].UID),
@@ -122,7 +127,7 @@ func (u *Users) Login(ctx *gin.Context) {
 		common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
 	}
 
-	if ok := addTokenToRedis(ctx,token); ok != nil {
+	if ok := addTokenToRedis(ctx, token); ok != nil {
 		common.SendResponse(ctx, common.ErrRedis, "")
 		return
 	}
@@ -132,8 +137,8 @@ func (u *Users) Login(ctx *gin.Context) {
 	common.SendResponse(ctx, common.OK, loginVo)
 }
 
-func (u *Users) Logout(ctx *gin.Context){
-	token:= ctx.Request.Header.Get("token")
+func (u *Users) Logout(ctx *gin.Context) {
+	token := ctx.Request.Header.Get("token")
 	//清除redis对应token缓存
 	err := removeTokenFromRedis(ctx, token)
 	if err != nil {
@@ -154,8 +159,8 @@ func (u Users) Register(ctx *gin.Context) {
 	if 0 < len(users) {
 		common.SendResponse(ctx, common.ErrUserExisted, "")
 	} else {
-		registerQO.State = 1
-		registerQO.IsRoot = 0
+		registerQO.State = cpgConst.ONE
+		registerQO.IsRoot = cpgConst.ZERO
 		storePasswd, err := u.encryption(registerQO.Passwd)
 		if err != nil {
 			common.SendResponse(ctx, common.ErrEncryption, err.Error())
