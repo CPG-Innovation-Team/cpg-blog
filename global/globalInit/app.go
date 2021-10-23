@@ -22,8 +22,6 @@ type app struct {
 
 	// 项目根目录
 	RootDir string
-	// 模板根目录
-	TemplateDir string
 
 	// 启动时间
 	LaunchTime time.Time
@@ -59,7 +57,6 @@ func init() {
 	if !viper.InConfig("http.port") {
 		App.RootDir = inferRootDir()
 	}
-	App.TemplateDir = App.RootDir + "/template/"
 
 	fileInfo, err := os.Stat(os.Args[0])
 	if err != nil {
@@ -69,9 +66,6 @@ func init() {
 	App.Date = fileInfo.ModTime()
 	App.Build.GoVersion = runtime.Version()
 	App.Build.GinVersion = gin.Version
-	App.Name = viper.GetString("name")
-	App.Domain = viper.GetString("domain")
-	App.Desc = viper.GetStringMapString("desc")
 }
 
 // inferRootDir 递归推导项目根目录
@@ -98,6 +92,10 @@ func inferRootDir() string {
 }
 
 func (a *app) FillBuildInfo(gitCommitLog, buildTime, gitRelease string) {
+	App.Name = viper.GetString("name")
+	App.Domain = viper.GetString("domain")
+	App.Desc = viper.GetStringMapString("desc")
+
 	a.Build.GitCommitLog = gitCommitLog
 	a.Build.BuildTime = buildTime
 
@@ -106,7 +104,7 @@ func (a *app) FillBuildInfo(gitCommitLog, buildTime, gitRelease string) {
 		a.Build.GitRelease = gitRelease[pos+1:]
 	}
 
-	fmt.Println(a)
+	fmt.Println(*a)
 }
 
 // SetFrameMode debug\test\release
