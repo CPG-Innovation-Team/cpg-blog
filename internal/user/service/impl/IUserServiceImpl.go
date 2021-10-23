@@ -85,35 +85,18 @@ func (u Users) comparePwd(storePasswd, passwd string) (err error) {
 	return bcrypt.CompareHashAndPassword([]byte(storePasswd), []byte(passwd))
 }
 
-// FindUser 根据条件查询用户
-//func (u Users) FindUser(ctx *gin.Context, uidList []int, name string, email string) (users map[uint]model.User) {
-//	findQO := &dao.UserDAO{
-//		UId:   uidList,
-//		Name:  name,
-//		Email: email,
-//	}
-//	userList := findQO.GetUser(ctx)
-//	users = map[uint]model.User{}
-//	for _, v := range *userList {
-//		users[v.UID] = v
-//	}
-//	return users
-//}
-
 func (u *Users) Login(ctx *gin.Context) {
 	loginQo := qo.LoginQO{}
 	util.JsonConvert(ctx, &loginQo)
 	users := new(dao.UserDAO).SelectByName(ctx, loginQo.Username)
 	if 0 == len(users) {
 		common.SendResponse(ctx, common.ErrUserNotFound, "")
-	}
-
-	if users[0].Passwd != loginQo.Passwd {
-		common.SendResponse(ctx, common.ErrPasswordIncorrect, "")
+		return
 	}
 
 	if u.comparePwd(users[0].Passwd, loginQo.Passwd) != nil {
 		common.SendResponse(ctx, common.ErrPasswordIncorrect, "")
+		return
 	}
 	//生成token
 	tokenInfo := tokenInfo{
@@ -125,6 +108,7 @@ func (u *Users) Login(ctx *gin.Context) {
 	token, err := genToken(tokenInfo)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
+		return
 	}
 
 	if ok := addTokenToRedis(ctx, token); ok != nil {
@@ -158,6 +142,7 @@ func (u Users) Register(ctx *gin.Context) {
 	users := new(dao.UserDAO).SelectByNameAndEmail(ctx, &model.User{UserName: registerQO.UserName, Email: registerQO.Email})
 	if 0 < len(users) {
 		common.SendResponse(ctx, common.ErrUserExisted, "")
+		return
 	} else {
 		registerQO.State = cpgConst.ONE
 		registerQO.IsRoot = cpgConst.ZERO
@@ -187,6 +172,7 @@ func (u Users) Register(ctx *gin.Context) {
 
 		if err != nil {
 			common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
+			return
 		}
 		loginVo := vo.LoginVo{
 			Token: token,
