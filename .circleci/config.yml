@@ -48,6 +48,7 @@ jobs:
       - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - run:
           command:
+            mkdir -p /tmp/build
             go build
       - run: echo '==============部署开始=============='
       - deploy:
