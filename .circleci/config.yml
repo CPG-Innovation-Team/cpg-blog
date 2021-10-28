@@ -41,12 +41,10 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run:
-          command:
-            go build ~/cpg-blog/cmd/cpg
-            echo '==============部署开始=============='
-            sudo apt-get update && sudo apt-get install rsync
-            echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
+      - run: go build ~/cpg-blog/cmd/cpg
+      - run: echo '==============部署开始=============='
+      - run: sudo apt-get update && sudo apt-get install rsync
+      - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
