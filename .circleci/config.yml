@@ -1,18 +1,10 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  build:
-    working_directory: ~/repo
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  build-and-test:
+    working_directory: ~/blog
     docker:
       - image: circleci/golang:1.15.8
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
       - restore_cache:
@@ -33,10 +25,43 @@ jobs:
       - store_test_results:
           path: /tmp/test-reports
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  build-and-deploy:
+    working_directory: ~/blog
+    docker:
+      - image: circleci/golang:1.15.8
+    steps:
+      - checkout
+      - restore_cache:
+            keys:
+              - go-mod-v4-{{ checksum "go.sum" }}
+        - run:
+            name: Install Dependencies
+            command: go mod download
+        - save_cache:
+            key: go-mod-v4-{{ checksum "go.sum" }}
+            paths:
+              - "/go/pkg/mod"
+      - run:
+          command:
+            go build ~/cpg-blog/cmd/cpg
+            echo '==============部署开始=============='
+            sudo apt-get update && sudo apt-get install rsync
+            echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
+      -deploy:
+        name: deploy
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "master" ]; then
+            rsync -avce ssh build $USER@$IP_ADDRESS:/data/cpg-service/
+            else
+            echo "Not master branch, dry run only"
+            fi
+            - run: echo '==============部署完毕=============='
+
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  default:
     jobs:
-      - build
+      - build-and-test
+      - build-and-deploy:
+          filters:
+            branches:
+              only: master
