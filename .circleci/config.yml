@@ -48,7 +48,7 @@ jobs:
             sudo apt-get update && sudo apt-get install rsync
             echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - deploy:
-          command:|
+          command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ~/cpg-blog/cmd/cpg $USER@$IP_ADDRESS:/data/cpg-service/
             else
