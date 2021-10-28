@@ -44,7 +44,7 @@ jobs:
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
-            - "9b:78:08:72:7a:78:59:8f:4e:ff:fa:30:a2:d5:91:d2"
+            - "7b:fa:15:a5:ed:d3:2d:8c:e1:4a:ad:3f:bd:c1:a0:19"
       - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - run:
           command:
