@@ -47,15 +47,14 @@ jobs:
             echo '==============部署开始=============='
             sudo apt-get update && sudo apt-get install rsync
             echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
-      -deploy:
-        name: deploy
-          command: |
+      - deploy:
+          command:|
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ssh build $USER@$IP_ADDRESS:/data/cpg-service/
             else
             echo "Not master branch, dry run only"
             fi
-            - run: echo '==============部署完毕=============='
+      - run: echo '==============部署完毕=============='
 
 workflows:
   default:
