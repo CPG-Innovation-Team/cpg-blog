@@ -41,6 +41,7 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+      - run: sudo apt-get update && sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
             - "42:99:78:ba:bc:ac:56:bb:33:d8:04:7d:58:a0:30:98"
