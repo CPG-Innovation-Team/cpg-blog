@@ -31,16 +31,6 @@ jobs:
       - image: circleci/golang:1.15.8
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
-      - run:
-          name: Install Dependencies
-          command: go mod download
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
       - add_ssh_keys:
           fingerprints:
             - "42:99:78:ba:bc:ac:56:bb:33:d8:04:7d:58:a0:30:98"
