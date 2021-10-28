@@ -55,6 +55,9 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ssh ~/blog/tmp/blog $USER@$IP_ADDRESS:/data/cpg-service/
+              if [ -z "$(ssh-keygen -F $IP)" ]; then
+              ssh-keyscan -H $IP >> ~/.ssh/known_hosts
+              fi
             else
             echo "Not master branch, dry run only"
             fi
