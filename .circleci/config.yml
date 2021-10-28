@@ -51,6 +51,7 @@ jobs:
             go build
             echo '==============部署开始=============='
             sudo apt-get update && sudo apt-get install rsync
+            ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
