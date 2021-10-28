@@ -50,7 +50,7 @@ jobs:
           command:
             mkdir -p /tmp/build
             go build
-      - run: echo '==============部署开始================'
+      - run: echo '==============部署开始================='
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
