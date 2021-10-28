@@ -41,18 +41,20 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run: 
-          name: build and push remote server
+      - add_ssh_keys:
+          fingerprints:
+            - "42:99:78:ba:bc:ac:56:bb:33:d8:04:7d:58:a0:30:98"
+      - run: echo $BlogKey >> ~/.ssh/known_hosts
+      - run:
           command:
             mkdir -p /tmp/blog
             go build
             echo '==============部署开始=============='
             sudo apt-get update && sudo apt-get install rsync
-            echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-            rsync -avce ~/blog/tmp/blog $USER@$IP_ADDRESS:/data/cpg-service/
+            rsync -avce ssh ~/blog/tmp/blog $USER@$IP_ADDRESS:/data/cpg-service/
             else
             echo "Not master branch, dry run only"
             fi
