@@ -42,6 +42,7 @@ jobs:
           paths:
             - "/go/pkg/mod"
       - run: cp -r ../cpg-blog/cmd/cpg/* ~/cpg-blog/
+      - run: ls -a ~/cpg-blog/
       - run: go build ~/cmd/cpg
       - run: ls -a ~/cpg-blog/
       - run: sudo apt-get install rsync
