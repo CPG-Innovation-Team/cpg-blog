@@ -41,7 +41,6 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run: cp ../cpg-blog/* ~/cpg-blog/
       - run: go build ~/cpg-blog/cmd/cpg
       - run: sudo apt-get install rsync
       - add_ssh_keys:
