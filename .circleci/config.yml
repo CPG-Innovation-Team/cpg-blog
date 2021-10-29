@@ -26,7 +26,7 @@ jobs:
           path: /tmp/test-reports
 
   build-and-deploy:
-    working_directory: /cpg-blog/cmd/cpg
+    working_directory: ../cpg-blog/cmd/cpg
     docker:
       - image: circleci/golang:1.15.8
     steps:
@@ -41,7 +41,7 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run: go build /cpg-blog/cmd/cpg
+      - run: go build ../cpg-blog/cmd/cpg
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
