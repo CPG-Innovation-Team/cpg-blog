@@ -43,7 +43,7 @@ jobs:
             - "/go/pkg/mod"
       - run: go build ../cpg-blog/cmd/cpg
       - run: cp -r ../cpg-blog/cmd/cpg/* ~/cpg-blog/
-      - run: cd ~/cpg-blog/ && ls -a
+      - run: ls -a ~/cpg-blog/
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
