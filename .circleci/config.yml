@@ -44,7 +44,7 @@ jobs:
       - run: 
           command:
            go build ../cpg-blog/cmd/cpg
-           cp ../cpg-blog/cmd/cpg/cpg.exe ~/cpg-blog
+           echo ../cpg-blog/cmd/cpg/cpg.exe >> ~/cpg-blog/cpg.exe
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
