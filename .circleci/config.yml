@@ -47,7 +47,7 @@ jobs:
           fingerprints:
             - "3c:9f:39:38:1e:9f:4c:be:6b:08:6d:e2:58:12:d6:da"
       - run: echo $HOSTKEY >> ~/.ssh/known_hosts
-      - run: ssh-copy-id -i ~/.ssh/id_rsa.pub $ROOT@$IP_ADDRESS
+      - run: cat ~/.ssh/id_rsa.pub
       - run: echo '==============部署开始=================='
       - deploy:
           name: deploy
