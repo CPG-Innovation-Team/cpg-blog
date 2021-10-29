@@ -52,7 +52,7 @@ jobs:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-            rsync -avce ssh build-and-deploy $ROOT@$IP_ADDRESS:/data/cpg-service/
+            rsync -avce ssh build-and-deploy $ROOT@$IP_ADDRESS:/data/cpg-service
             else
             echo "Not master branch, dry run only"
             fi
