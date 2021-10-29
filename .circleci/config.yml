@@ -41,17 +41,15 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+      - run: go build
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
             - "7b:fa:15:a5:ed:d3:2d:8c:e1:4a:ad:3f:bd:c1:a0:19"
       - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
-      - run:
-          command:
-            mkdir -p /tmp/build
-            go build
       - run: echo '==============部署开始=================='
       - deploy:
+          name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -ave ssh build-and-deploy $USER@$IP_ADDRESS:/data/cpg-service/
@@ -61,10 +59,11 @@ jobs:
       - run: echo '==============部署完毕================='
 
 workflows:
+  version: 2
   default:
-    jobs:
-      - build-and-test
-      - build-and-deploy:
+     jobs:
+       - build-and-test
+       - build-and-deploy:
           filters:
             branches:
               only: master
