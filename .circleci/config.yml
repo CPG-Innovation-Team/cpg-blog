@@ -2,7 +2,7 @@ version: 2.1
 
 jobs:
   build-and-test:
-    working_directory: ~/blog
+    working_directory: ~/test
     docker:
       - image: circleci/golang:1.15.8
     steps:
@@ -26,7 +26,7 @@ jobs:
           path: /tmp/test-reports
 
   build-and-deploy:
-    working_directory: ~/cpg-blog
+    working_directory: ../cpg-blog/cmd/cpg
     docker:
       - image: circleci/golang:1.15.8
     steps:
@@ -41,8 +41,12 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run: go build ../cpg-blog/cmd/cpg
-      - run: ls -a ../cpg-blog/cmd/cpg
+      - run:
+         command: 
+           mkdir -p ./build-result
+           go build
+      - store_artifacts:
+          path: ./build-result
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
@@ -53,7 +57,7 @@ jobs:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-            rsync -avce ssh ~/cpg-blog/cmd/cpg/cpg.exe $ROOT@$IP_ADDRESS:/data/cpg-service
+            rsync -avce ssh ./build-result/cpg.exe $ROOT@$IP_ADDRESS:/data/cpg-service
             else
             echo "Not master branch, dry run only"
             fi
