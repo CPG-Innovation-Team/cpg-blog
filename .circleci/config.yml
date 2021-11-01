@@ -57,7 +57,6 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ssh ~/cpg-blog/cmd/cpg/main.exe $ROOT@$IP_ADDRESS:/data/cpg-blog
-            ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog; ./main"
             else
             echo "Not master branch, dry run only"
             fi
