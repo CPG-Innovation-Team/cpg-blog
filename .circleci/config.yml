@@ -42,6 +42,7 @@ jobs:
           paths:
             - "/go/pkg/mod"
       - run: go env
+      - run: go build ~/cpg-blog
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
@@ -52,8 +53,7 @@ jobs:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-            rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
-            ssh $ROOT@$IP_ADDRESS "go build /data/cpg-blog/cmd/cpg/main.go"
+            rsync -avce ssh ~/cpg-blog/cmd/cpg/main.exe $ROOT@$IP_ADDRESS:/data/cpg-blog
             else
             echo "Not master branch, dry run only"
             fi
