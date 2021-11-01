@@ -44,7 +44,7 @@ jobs:
       - run: go build -o main ~/cpg-blog/cmd/cpg
       - run: sudo apt-get install rsync
       - run: go env
-      - run: ls -a /home/circleci/.cache/go-build/
+      - run: ls -a /home/circleci/.cache/go-build
       - run: ls -a ~/cpg-blog/cmd/cpg
       - add_ssh_keys:
           fingerprints:
