@@ -45,7 +45,7 @@ jobs:
           name: build
           command: cd ~/cpg-blog/cmd/cpg && go build
       - run: ls -a ~/cpg-blog/cmd/cpg
-      - run: ls -a ~/cpg-blog
+      - run: ls -a ~/cpg-blog/.circleci
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
@@ -56,7 +56,7 @@ jobs:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-            rsync -avce ssh ~/cpg-blog/cmd/cpg/main.go $ROOT@$IP_ADDRESS:/data/cpg-blog
+            rsync -avce ssh ~/cpg-blog/cmd/cpg/cpg $ROOT@$IP_ADDRESS:/data/cpg-blog
             else
             echo "Not master branch, dry run only"
             fi
