@@ -45,7 +45,9 @@ jobs:
       - run: sudo apt-get install rsync
       - run: go env
       - run: ls -a /go
-      - run: ls -a ~/cpg-blog/cmd/cpg
+      - run: ls -a /go/bin
+      - run: ls -a /go/pkg
+      - run: ls -a /go/src
       - add_ssh_keys:
           fingerprints:
             - "3c:9f:39:38:1e:9f:4c:be:6b:08:6d:e2:58:12:d6:da"
