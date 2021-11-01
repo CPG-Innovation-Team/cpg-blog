@@ -43,7 +43,6 @@ jobs:
             - "/go/pkg/mod"
       - run: go env
       - run: go build ~/cpg-blog/cmd/cpg
-      - run: ls -a $GOCACHE/cmd
       - run: sudo apt-get install rsync
       - add_ssh_keys:
           fingerprints:
