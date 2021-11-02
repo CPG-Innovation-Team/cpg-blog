@@ -69,7 +69,7 @@ workflows:
      jobs:
       - build-and-test
       - build-and-deploy:
-         hasMain: ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; ps -A | grep main"
+         hasMain: ssh $ROOT@$IP_ADDRESS "killall main"
          requires:
           - build-and-test
          filters:
