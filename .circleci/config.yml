@@ -53,8 +53,8 @@ jobs:
       - deploy:
           name: deploy
           command: |
-            setenv HAS = ${hasMain}
-            if [ " " != HAS ];then
+            HAS = ${hasMain}
+            if [ " " != $HAS ];then
             ssh $ROOT@$IP_ADDRESS "killall main"
             fi
 
