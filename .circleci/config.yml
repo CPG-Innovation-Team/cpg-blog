@@ -55,7 +55,7 @@ jobs:
             else
             echo "Not master branch, dry run only"
             fi
-            ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg; go build main.go; nohup ./main.exe &"
+            ssh $ROOT@$IP_ADDRESS "source /etc/profile; cd /data/cpg-blog/cmd/cpg; go build main.go; nohup ./main.exe &"
       - run: echo '==============部署完毕=================='
 
 workflows:
