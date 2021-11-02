@@ -53,8 +53,8 @@ jobs:
       - deploy:
           name: deploy
           command: |
-            HAS = ${hasMain}
-            if [ " " != $HAS ];then
+            a = hasMain
+            if [ " " != ${a} ];then
             ssh $ROOT@$IP_ADDRESS "killall main"
             fi
 
