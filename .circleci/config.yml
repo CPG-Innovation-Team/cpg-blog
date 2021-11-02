@@ -55,7 +55,6 @@ jobs:
             else
             echo "Not master branch, dry run only"
             fi
-
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg; go build main.go; nohup ./main.exe &"
       - run: echo '==============部署完毕=================='
 
@@ -63,7 +62,10 @@ workflows:
   version: 2
   default:
      jobs:
-       - build-and-deploy:
-          filters:
+      - build-and-test
+      - build-and-deploy:
+         requires:
+          - build-and-test
+         filters:
             branches:
               only: master
