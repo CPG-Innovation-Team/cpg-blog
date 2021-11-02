@@ -27,6 +27,9 @@ jobs:
 
   build-and-deploy:
     working_directory: ~/cpg-blog
+    parameters:
+      hasMain:
+        type: string
     docker:
       - image: circleci/golang:1.15.8
     steps:
@@ -54,7 +57,7 @@ jobs:
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; go build main.go"
             
-            if [ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; ps -A | grep main" = ""];then
+            if [${hasMain} != ""];then
             ssh $ROOT@$IP_ADDRESS "killall main"
             fi
 
@@ -71,6 +74,7 @@ workflows:
      jobs:
       - build-and-test
       - build-and-deploy:
+         hasMain: ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; ps -A | grep main"
          requires:
           - build-and-test
          filters:
