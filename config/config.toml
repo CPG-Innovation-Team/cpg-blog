@@ -13,8 +13,8 @@ desc = "balabala"
 # 存储配置
 [storage]
 driver = "mysql"
-user = "root"
-password = "chenXI951026."
+user = "cpg"
+password = "arxWijx3Z7KCpxWb"
 host = "localhost"
 port = 3306
 dbname = "cpg"
@@ -29,6 +29,7 @@ prefix = "cpg_blog_"
 # redis配置
 [redis]
 host = "localhost"
+password = "chenXI951026."
 port = 6379
 
 # 监听端口
