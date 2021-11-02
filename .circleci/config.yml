@@ -56,7 +56,9 @@ jobs:
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; go build main.go"
+            if [${hasMain} != "main: no process found"];then
             ssh $ROOT@$IP_ADDRESS "killall main"
+            fi
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/ && nohup ./main &"
             ssh $ROOT@$IP_ADDRESS "exit"
             else
@@ -70,7 +72,7 @@ workflows:
      jobs:
       - build-and-test
       - build-and-deploy:
-         hasMain: ssh $ROOT@$IP_ADDRESS "ps -A | grep main"
+         hasMain: ssh $ROOT@$IP_ADDRESS "killall main"
          requires:
           - build-and-test
          filters:
