@@ -53,7 +53,7 @@ jobs:
       - deploy:
           name: deploy
           command: |
-            if [ "${hasMain}" = "main: no process found" ];then
+            if [ "${hasMain}" != " " ];then
             ssh $ROOT@$IP_ADDRESS "killall main"
             fi
 
