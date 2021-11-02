@@ -53,9 +53,6 @@ jobs:
       - deploy:
           name: deploy
           command: |
-            if [${hasMain} = ""];then
-            ssh $ROOT@$IP_ADDRESS "killall main"
-            fi
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; go build main.go"
