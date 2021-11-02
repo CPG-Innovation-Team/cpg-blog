@@ -61,11 +61,11 @@ jobs:
 workflows:
   version: 2
   default:
-    jobs:
+     jobs:
       - build-and-test
       - build-and-deploy:
-          requires:
-            - build-and-test
-          filters:
+         requires:
+          - build-and-test
+         filters:
             branches:
               only: master
