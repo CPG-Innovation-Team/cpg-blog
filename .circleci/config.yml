@@ -66,7 +66,7 @@ jobs:
             else
             echo "Not master branch, dry run only"
             fi
-      - run: echo '==============部署完毕=================='
+      - run: echo '==============部署完毕==================='
 
 workflows:
   version: 2
