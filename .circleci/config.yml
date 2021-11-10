@@ -50,12 +50,11 @@ jobs:
             - "3c:9f:39:38:1e:9f:4c:be:6b:08:6d:e2:58:12:d6:da"
       - run: echo $HOSTKEY >> ~/.ssh/known_hosts
       - run: echo '===============部署开始==================='
-      - run: a=${hasMain}
       - deploy:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-             if [-n ${a}];then
+             if [-n ${hasMain}];then
              ssh $ROOT@$IP_ADDRESS "killall main"
              fi
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
