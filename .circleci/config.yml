@@ -27,9 +27,6 @@ jobs:
 
   build-and-deploy:
     working_directory: ~/cpg-blog
-    parameters:
-      hasMain:
-        type: string
     docker:
       - image: circleci/golang:1.15.8
     steps:
@@ -54,7 +51,8 @@ jobs:
           name: deploy
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
-             if [-n ${hasMain}];then
+             hasmain=$(ssh $ROOT@$IP_ADDRESS "ps -A | grep main")
+             if [-n hasmain];then
              ssh $ROOT@$IP_ADDRESS "killall main"
              fi
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
@@ -72,7 +70,6 @@ workflows:
      jobs:
       - build-and-test
       - build-and-deploy:
-         hasMain: ssh $ROOT@$IP_ADDRESS "ps -A | grep main"
          requires:
           - build-and-test
          filters:
