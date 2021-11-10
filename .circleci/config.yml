@@ -52,8 +52,8 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
              hasmain=$(ssh $ROOT@$IP_ADDRESS "ps -A | grep main")
-             echo $hasmain
-             if [-n "$hasmain"];then
+             lenth=${#hasmain}
+             if [ lenth == 0];then
              ssh $ROOT@$IP_ADDRESS "killall main"
              fi
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
