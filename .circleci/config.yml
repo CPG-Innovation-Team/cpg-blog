@@ -53,7 +53,6 @@ jobs:
             if [ "${CIRCLE_BRANCH}" = "master" ]; then
             hasmain=$(ssh $ROOT@$IP_ADDRESS "ps -A | grep main")
             lenth=${#hasmain}
-            echo $lenth
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; go build main.go"
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/ && nohup ./main &" > nohup.out
