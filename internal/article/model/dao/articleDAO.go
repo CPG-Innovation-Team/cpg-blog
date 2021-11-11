@@ -67,6 +67,18 @@ func (ad ArticleDAO) SelectArticleBySn(sn int64) (a *model.Article) {
 	return a
 }
 
+func (ad ArticleDAO) SelectArticleByState(state uint) (articlesMap map[int64]model.Article) {
+	var articles []model.Article
+	articles = []model.Article{}
+	articlesMap = map[int64]model.Article{}
+
+	globalInit.Db.Model(&model.Article{}).Where("state", state).Find(&articles)
+	for _, v := range articles {
+		articlesMap[v.Sn] = v
+	}
+	return articlesMap
+}
+
 func (ad ArticleDAO) FindArticles(ctx *gin.Context) (articlesVO vo.ArticleListVO) {
 	tx := (*Db).WithContext(ctx).Model(&model.Article{})
 	if ad.Page.PageNum > 0 && ad.Page.PageSize > 0 {

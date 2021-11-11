@@ -42,7 +42,7 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	return
 }
 
-//func (a Article) FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
+//func (a Article) FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
 //	var articles []model.Article
 //	articles = []model.Article{}
 //	articlesMap = map[int64]model.Article{}
@@ -223,11 +223,11 @@ func (a Article) Update(ctx *gin.Context) {
 
 	//校验state
 	state, _ := strconv.Atoi(updateQO.State)
-	updateDAO.State = state
 	if state != unreviewed && state != published && state != removed && state != deleted {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
+	updateDAO.State = state
 	err := updateDAO.UpdateArticle(ctx)
 	if err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err)

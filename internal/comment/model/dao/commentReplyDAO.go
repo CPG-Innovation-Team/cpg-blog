@@ -83,6 +83,17 @@ func (c CommentReply) CreateCommentReply(ctx *gin.Context) (replyId uint, err er
 	return c.Id, err
 }
 
+func (c CommentReply) SelectByState(state uint) (reply map[uint]model.CommentReply)  {
+	var replies []model.CommentReply
+	replies = []model.CommentReply{}
+	replyMap := map[uint]model.CommentReply{}
+	globalInit.Db.Model(&model.CommentReply{}).Where("state = ?", state).Find(&replies)
+	for _, v := range replies {
+		replyMap[v.Id] = v
+	}
+	return replyMap
+}
+
 func (c CommentReply) DeleteCommentReplyById(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	tx.Model(&c)
@@ -95,6 +106,28 @@ func (c CommentReply) DeleteCommentReplyById(ctx *gin.Context) (err error) {
 		}
 
 		tx.Updates(c)
+
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+
+		tx.Commit()
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+		return nil
+	}(tx)
+	return
+}
+
+func (c CommentReply) UpdateCommentReplyStateByCid(id int, state int) (err error) {
+	c.Id = uint(id)
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		e := common.ErrDatabase
+		tx.Model(&c).Update("state", state)
 
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
