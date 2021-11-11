@@ -23,6 +23,6 @@ type IArticle interface {
 	// UpdateArticleEx 服务间更新文章扩展信息
 	//UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error
 
-	// FindArticles 服务间查询文章信息，支持list
-	//FindArticles(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
+	// FindArticlesBySn 服务间查询文章信息，支持list
+	//FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
 }

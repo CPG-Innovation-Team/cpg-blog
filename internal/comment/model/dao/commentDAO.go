@@ -54,6 +54,17 @@ func (c Comment) CreateComment(ctx *gin.Context) (cid uint, err error) {
 	return c.Cid, err
 }
 
+func (c Comment) SelectByState(state uint) (comment map[uint]model.Comment) {
+	var comments []model.Comment
+	comments = []model.Comment{}
+	commentMap := map[uint]model.Comment{}
+	globalInit.Db.Model(&model.Comment{}).Where("state = ?", state).Find(&comments)
+	for _, v := range comments {
+		commentMap[v.Cid] = v
+	}
+	return commentMap
+}
+
 func (c Comment) UpdateComment(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
@@ -80,6 +91,28 @@ func (c Comment) UpdateCommentZan(cid int, add int) (err error) {
 	e := common.ErrDatabase
 	err = func(db *gorm.DB) error {
 		tx.Model(&c).Update("zan_num", add)
+		tx.Commit()
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+		return nil
+	}(tx)
+	return
+}
+
+func (c Comment) UpdateCommentState(cid int, state int) (err error) {
+	c.Cid = uint(cid)
+
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		e := common.ErrDatabase
+		tx.Model(&c).Update("state", state)
+		if tx.Error != nil {
+			e.Message = tx.Error.Error()
+			return e
+		}
+
 		tx.Commit()
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
