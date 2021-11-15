@@ -159,7 +159,7 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//插入评论
 	//TODO 后续增加审核功能
-	comment.State = cpgConst.ONE
+	comment.State = cpgConst.ZERO
 	comment.Sn = addQO.Sn
 	comment.Content = addQO.Content
 	comment.Floor = floor + cpgConst.ONE
@@ -281,7 +281,7 @@ func (c Comment) AddReply(ctx *gin.Context) {
 	reply.UID = uint(uid)
 	reply.Content = replyQO.Content
 	//TODO 后续增加审核功能
-	reply.State = cpgConst.ONE
+	reply.State = cpgConst.ZERO
 	replyId, err := reply.CreateCommentReply(ctx)
 	if err != nil {
 		common.SendResponse(ctx, err, replyVO)

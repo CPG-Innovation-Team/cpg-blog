@@ -149,7 +149,7 @@ func (a Article) Add(ctx *gin.Context) {
 
 	//新增文章的state为未审核1
 	//TODO 后续需要增加审核功能，初始state应为0
-	article.State = published
+	article.State = unreviewed
 
 	article.Sn = common.Snowflake.NextID()
 	log.Println(article.Sn)
