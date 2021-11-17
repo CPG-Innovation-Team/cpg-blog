@@ -5,6 +5,7 @@ import (
 	"cpg-blog/internal/controller/auth"
 	"cpg-blog/internal/controller/comment"
 	"cpg-blog/internal/controller/like"
+	"cpg-blog/internal/controller/review"
 	"cpg-blog/internal/controller/user"
 	"github.com/gin-gonic/gin"
 )
@@ -28,4 +29,5 @@ func RegisterRoutes(g *gin.RouterGroup) {
 	IRegisterRoute.RegisterRoute(new(user.Controller), g)
 	IRegisterRoute.RegisterRoute(new(article.Controller), g)
 	IRegisterRoute.RegisterRoute(new(auth.Controller), g)
+	IRegisterRoute.RegisterRoute(new(review.Controller), g)
 }
