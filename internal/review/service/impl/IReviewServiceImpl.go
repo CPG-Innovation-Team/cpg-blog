@@ -37,60 +37,60 @@ const (
 func (v Review) ReviewArticleList(ctx *gin.Context) {
 	data := articleCommonFunc.ArticleCommonFunc{}.FindArticlesByState(unreviewed)
 	reviewArticleVo := new(vo.ReviewArticleVO)
-	_ = copier.Copy(reviewArticleVo, &data)
+	_ = copier.Copy(&reviewArticleVo.ArticleMap, &data)
 	common.SendResponse(ctx, common.OK, reviewArticleVo)
 }
 
 func (v Review) ArticleReviewFailedList(ctx *gin.Context) {
 	data := articleCommonFunc.ArticleCommonFunc{}.FindArticlesByState(removed)
 	ArticleReviewFailedVo := new(vo.ReviewArticleVO)
-	_ = copier.Copy(ArticleReviewFailedVo, &data)
+	_ = copier.Copy(&ArticleReviewFailedVo.ArticleMap, &data)
 	common.SendResponse(ctx, common.OK, ArticleReviewFailedVo)
 }
 
 func (v Review) ReviewCommentList(ctx *gin.Context) {
 	data := commentCommonFunc.CommentCommonFunc{}.SelectCommentByState(unreviewed)
 	ReviewCommentVo := new(vo.ReviewCommentVO)
-	_ = copier.Copy(ReviewCommentVo, &data)
+	_ = copier.Copy(&ReviewCommentVo.CommentMap, &data)
 	common.SendResponse(ctx, common.OK, ReviewCommentVo)
 }
 
 func (v Review) CommentReviewFailedList(ctx *gin.Context) {
 	data := commentCommonFunc.CommentCommonFunc{}.SelectCommentByState(removed)
 	ReviewCommentVo := new(vo.ReviewCommentVO)
-	_ = copier.Copy(ReviewCommentVo, &data)
+	_ = copier.Copy(&ReviewCommentVo.CommentMap, &data)
 	common.SendResponse(ctx, common.OK, ReviewCommentVo)
 }
 
 func (v Review) ReviewReplyList(ctx *gin.Context) {
 	data := commentCommonFunc.CommentCommonFunc{}.SelectReplyByState(unreviewed)
 	ReplyVo := new(vo.ReviewReplyVO)
-	_ = copier.Copy(ReplyVo, &data)
+	_ = copier.Copy(&ReplyVo.ReplyMap, &data)
 	common.SendResponse(ctx, common.OK, ReplyVo)
 }
 
 func (v Review) ReplyReviewFailedList(ctx *gin.Context) {
 	data := commentCommonFunc.CommentCommonFunc{}.SelectReplyByState(removed)
 	ReplyVo := new(vo.ReviewReplyVO)
-	_ = copier.Copy(ReplyVo, &data)
+	_ = copier.Copy(&ReplyVo.ReplyMap, &data)
 	common.SendResponse(ctx, common.OK, ReplyVo)
 }
 
-func (v Review) ReviewArticle(ctx *gin.Context, qo qo.ReviewArticleQO) {
-	util.JsonConvert(ctx, qo)
+func (v Review) ReviewArticle(ctx *gin.Context, query *qo.ReviewArticleQO) {
+	util.JsonConvert(ctx, query)
 
 	//根据sn查询相关文章
-	articleMap := articleCommonFunc.ArticleCommonFunc{}.FindArticlesBySn(ctx, []int64{qo.Sn})
-	if _, ok := articleMap[qo.Sn]; !ok {
+	articleMap := articleCommonFunc.ArticleCommonFunc{}.FindArticlesBySn(ctx, []int64{query.Sn})
+	if _, ok := articleMap[query.Sn]; !ok {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
 		return
 	}
 
 	state := removed
-	if qo.State {
+	if query.State {
 		state = published
 	}
-	err := articleCommonFunc.ArticleCommonFunc{}.UpdateArticle(qo.Sn, state)
+	err := articleCommonFunc.ArticleCommonFunc{}.UpdateArticle(query.Sn, state)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return
@@ -99,20 +99,20 @@ func (v Review) ReviewArticle(ctx *gin.Context, qo qo.ReviewArticleQO) {
 
 }
 
-func (v Review) ReviewComment(ctx *gin.Context, qo qo.ReviewCommentQO) {
-	util.JsonConvert(ctx, qo)
+func (v Review) ReviewComment(ctx *gin.Context, query *qo.ReviewCommentQO) {
+	util.JsonConvert(ctx, query)
 
 	//根据commentID查询相关评论信息
-	err, _ := commentCommonFunc.CommentCommonFunc{}.SelectComment(qo.CommentId)
-	if err != nil {
+	err, _ := commentCommonFunc.CommentCommonFunc{}.SelectComment(query.CommentId)
+	if err != nil && err != common.OK {
 		common.SendResponse(ctx, err, "")
 		return
 	}
 	state := removed
-	if qo.State {
+	if query.State {
 		state = published
 	}
-	err = commentCommonFunc.CommentCommonFunc{}.UpdateCommentState(qo.CommentId, state)
+	err = commentCommonFunc.CommentCommonFunc{}.UpdateCommentState(query.CommentId, state)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return
@@ -120,20 +120,20 @@ func (v Review) ReviewComment(ctx *gin.Context, qo qo.ReviewCommentQO) {
 	common.SendResponse(ctx, common.OK, "")
 }
 
-func (v Review) ReviewReply(ctx *gin.Context, qo qo.ReviewReplyQO) {
-	util.JsonConvert(ctx, qo)
+func (v Review) ReviewReply(ctx *gin.Context, query *qo.ReviewReplyQO) {
+	util.JsonConvert(ctx, query)
 
 	//根据id查询相关回复信息
-	err, _ := commentCommonFunc.CommentCommonFunc{}.SelectReply(qo.ReplyId)
-	if err != nil {
+	err, _ := commentCommonFunc.CommentCommonFunc{}.SelectReply(query.ReplyId)
+	if err != nil && err != common.OK{
 		common.SendResponse(ctx, err, "")
 		return
 	}
 	state := removed
-	if qo.State {
+	if query.State {
 		state = published
 	}
-	err = commentCommonFunc.CommentCommonFunc{}.UpdateReplyState(qo.ReplyId, state)
+	err = commentCommonFunc.CommentCommonFunc{}.UpdateReplyState(query.ReplyId, state)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return

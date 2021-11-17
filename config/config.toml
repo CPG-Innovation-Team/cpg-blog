@@ -1,5 +1,5 @@
 # 域名
-domain = "http://localhost:2020"
+domain = "tofore.com.cn：88080"
 name = "cpg-blog"
 
 # env: dev\test\prod
@@ -15,7 +15,7 @@ desc = "balabala"
 driver = "mysql"
 user = "cpg"
 password = "arxWijx3Z7KCpxWb"
-host = "localhost"
+host = "81.68.251.252"
 port = 3306
 dbname = "cpg"
 charset = "utf8mb4"
@@ -28,7 +28,7 @@ prefix = "cpg_blog_"
 
 # redis配置
 [redis]
-host = "localhost"
+host = "81.68.251.252"
 password = "chenXI951026."
 port = 6379
 
