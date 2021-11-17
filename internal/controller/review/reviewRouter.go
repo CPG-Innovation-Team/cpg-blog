@@ -40,21 +40,21 @@ func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 	//查询审核未通过的评论回复列表
 	query.POST("/reply/failed/list", review.ReplyReviewFailedList)
 
-	//审核新增的文章
+	//审核新增/未通过的文章
 	update.POST("/article", func(context *gin.Context) {
-		query := qo.ReviewArticleQO{}
+		query := new(qo.ReviewArticleQO)
 		review.ReviewArticle(context, query)
 	})
 
-	//审核新增的评论
+	//审核新增/未通过的评论
 	update.POST("/comment", func(context *gin.Context) {
-		query := qo.ReviewCommentQO{}
+		query := new(qo.ReviewCommentQO)
 		review.ReviewComment(context, query)
 	})
 
-	//审核新增的评论回复
+	//审核新增/未通过的评论回复
 	update.POST("/reply", func(context *gin.Context) {
-		query := qo.ReviewReplyQO{}
+		query := new(qo.ReviewReplyQO)
 		review.ReviewReply(context, query)
 	})
 }

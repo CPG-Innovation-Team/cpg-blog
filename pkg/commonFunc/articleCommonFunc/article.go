@@ -23,7 +23,7 @@ type IArticle interface {
 	UpdateArticle(sn int64, state int) (err error)
 
 	// FindArticlesBySn 服务间根据sn查询文章信息，支持list
-	FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
+	FindPublishedArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
 
 	// FindArticlesByState 服务间根据state查询文章
 	FindArticlesByState(state int) map[int64]model.Article
@@ -51,7 +51,7 @@ func (ac ArticleCommonFunc) UpdateArticleEx(ctx *gin.Context, sn int64, view boo
 	return dao.ArticleDAO{}.UpdateArticleEx(sn, view, cmt, zan, add)
 }
 
-func (ac ArticleCommonFunc) FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article){
+func (ac ArticleCommonFunc) FindPublishedArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article){
 	var articles []model.Article
 	articles = []model.Article{}
 	articlesMap = map[int64]model.Article{}
@@ -65,6 +65,26 @@ func (ac ArticleCommonFunc) FindArticlesBySn(ctx *gin.Context, sn []int64) (arti
 		tx.Where("sn In", sn)
 	}
 	tx.Where("state", cpgConst.ONE).Find(&articles)
+	for _, v := range articles {
+		articlesMap[v.Sn] = v
+	}
+	return articlesMap
+}
+
+func (ac ArticleCommonFunc) FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article){
+	var articles []model.Article
+	articles = []model.Article{}
+	articlesMap = map[int64]model.Article{}
+
+	tx := globalInit.Db.WithContext(ctx).Model(&model.Article{})
+	if len(sn) == cpgConst.ONE {
+		tx.Where("sn", sn[0])
+	}
+
+	if len(sn) > cpgConst.ONE {
+		tx.Where("sn In", sn)
+	}
+	tx.Find(&articles)
 	for _, v := range articles {
 		articlesMap[v.Sn] = v
 	}

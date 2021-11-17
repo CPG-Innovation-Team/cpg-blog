@@ -74,7 +74,7 @@ func isLike(ctx *gin.Context, isCancelLike bool) (e error) {
 func likeArticle(sn int64, uid int) (err error) {
 	//查询文章是否存在,且已上线
 	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		FindArticlesBySn(&gin.Context{}, []int64{sn})
+		FindPublishedArticlesBySn(&gin.Context{}, []int64{sn})
 	articleDetail := articleMap[sn]
 	if reflect.DeepEqual(model2.Article{}, articleDetail) {
 		e := common.ErrParam
@@ -101,7 +101,7 @@ func likeArticle(sn int64, uid int) (err error) {
 func cancelLikeArticle(sn int64, uid int) (err error) {
 	//查询文章是否存在,且已上线
 	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		FindArticlesBySn(&gin.Context{}, []int64{sn})
+		FindPublishedArticlesBySn(&gin.Context{}, []int64{sn})
 	article := articleMap[sn]
 	if reflect.DeepEqual(model2.Article{}, article) {
 		e := common.ErrParam

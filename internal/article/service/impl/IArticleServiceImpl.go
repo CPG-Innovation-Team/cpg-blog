@@ -42,7 +42,7 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	return
 }
 
-//func (a Article) FindArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
+//func (a Article) FindPublishedArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
 //	var articles []model.Article
 //	articles = []model.Article{}
 //	articlesMap = map[int64]model.Article{}

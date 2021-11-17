@@ -16,7 +16,7 @@ type ReviewArticleQO struct {
 	/*
 		审核状态（通过/不通过 => true/false）
 	 */
-	State bool `binding:"required"`
+	State bool
 }
 
 //ReviewCommentQO 审核评论请求参数
@@ -27,7 +27,7 @@ type ReviewCommentQO struct {
 	/*
 		审核状态（通过/不通过 => true/false）
 	*/
-	State bool `binding:"required"`
+	State bool
 }
 
 //ReviewReplyQO 审核评论回复请求参数
@@ -38,5 +38,5 @@ type ReviewReplyQO struct {
 	/*
 		审核状态（通过/不通过 => true/false）
 	*/
-	State bool `binding:"required"`
+	State bool
 }

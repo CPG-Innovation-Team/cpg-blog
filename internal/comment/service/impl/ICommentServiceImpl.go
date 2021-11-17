@@ -143,7 +143,7 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//查询文章是否存在
 	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		FindArticlesBySn(ctx, []int64{addQO.Sn})
+		FindPublishedArticlesBySn(ctx, []int64{addQO.Sn})
 	if article, ok := articleMap[addQO.Sn]; !ok || article.State != cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, commentVO)
 		return
