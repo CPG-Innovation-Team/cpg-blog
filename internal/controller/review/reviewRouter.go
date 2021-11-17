@@ -16,10 +16,8 @@ type Controller struct{}
 
 var review = &impl.Review{}
 
-type params interface{}
-
 // RegisterRoute 添加review服务路由
-func (u Controller) RegisterRoute(g *gin.RouterGroup) {
+func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 
 	query := g.Group("/review/query")
 	update := g.Group("/review")
@@ -44,19 +42,19 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 
 	//审核新增的文章
 	update.POST("/article", func(context *gin.Context) {
-		qo := qo.ReviewArticleQO{}
-		review.ReviewArticle(context, qo)
+		query := qo.ReviewArticleQO{}
+		review.ReviewArticle(context, query)
 	})
 
 	//审核新增的评论
 	update.POST("/comment", func(context *gin.Context) {
-		qo := qo.ReviewCommentQO{}
-		review.ReviewComment(context, qo)
+		query := qo.ReviewCommentQO{}
+		review.ReviewComment(context, query)
 	})
 
 	//审核新增的评论回复
 	update.POST("/reply", func(context *gin.Context) {
-		qo := qo.ReviewReplyQO{}
-		review.ReviewReply(context, qo)
+		query := qo.ReviewReplyQO{}
+		review.ReviewReply(context, query)
 	})
 }
