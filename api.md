@@ -560,3 +560,197 @@
             }
         }
 ```
+
+# 查询所有需要审核的文章
+```
+	uri:/admin/review/query/article/list
+    query:{}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+              "ArticleMap": {
+                "21828941648556032": {
+                     "Aid": 1,
+                     "Sn": 21828941648556032,
+                     "Title": "test",
+                     "Uid": 1,
+                     "Cover": "www.baidu.com",
+                     "Content": "this is test",
+                     "Tags": "test",
+                     "State": 0,
+                     "CreatedAt": "2021-11-17T13:40:25.252+08:00",
+                     "UpdatedAt": "2021-11-17T17:28:21.634+08:00"
+                }}}
+        }
+```
+
+# 查询所有审核失败的文章
+```
+	uri:/admin/review/query/article/failed/list
+    query:{}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+              "ArticleMap": {
+                "21828941648556032": {
+                     "Aid": 1,
+                     "Sn": 21828941648556032,
+                     "Title": "test",
+                     "Uid": 1,
+                     "Cover": "www.baidu.com",
+                     "Content": "this is test",
+                     "Tags": "test",
+                     "State": 0,
+                     "CreatedAt": "2021-11-17T13:40:25.252+08:00",
+                     "UpdatedAt": "2021-11-17T17:28:21.634+08:00"
+                }}}
+        }
+```
+
+# 审核文章
+```
+	uri:/admin/review/article
+    query:
+        {
+          "sn":21828941648556032,
+          "state": false
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 查询所有需要审核的评论
+```
+	uri:/admin/review/query/comment/list
+    query:{}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                "CommentMap": {
+                    "1": {
+                    "Cid": 1,
+                    "Sn": 21828941648556032,
+                    "UID": 1,
+                    "Content": "add content 01",
+                    "ZanNum": 0,
+                    "Floor": 1,
+                    "State": 0,
+                    "CreatedAt": "2021-11-17T17:12:35+08:00"
+                        }
+                    }
+                }
+        }
+```
+
+# 查询所有审核失败的评论
+```
+	uri:/admin/review/query/comment/failed/list
+    query:{}
+        response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                "CommentMap": {
+                    "1": {
+                    "Cid": 1,
+                    "Sn": 21828941648556032,
+                    "UID": 1,
+                    "Content": "add content 01",
+                    "ZanNum": 0,
+                    "Floor": 1,
+                    "State": 0,
+                    "CreatedAt": "2021-11-17T17:12:35+08:00"
+                        }
+                    }
+                }
+        }
+```
+
+# 审核评论
+```
+	uri:/admin/review/comment
+    query:
+        {
+            "commentId": 1,
+            "state": false
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 查询所有需要审核的回复
+```
+	uri:/admin/review/query/reply/list
+    query:{}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                "ReplyMap": {
+                    "1": {
+                    "Id": 1,
+                    "Cid": 1,
+                    "UID": 1,
+                    "Content": "add reply",
+                    "State": 0,
+                    "CreatedAt": "2021-11-17T17:26:26+08:00"
+                    }
+                }    
+            }
+        }
+```
+
+# 查询所有审核失败的回复
+```
+	uri:/admin/review/query/reply/failed/list
+    query:{}
+        response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                "ReplyMap": {
+                    "1": {
+                    "Id": 1,
+                    "Cid": 1,
+                    "UID": 1,
+                    "Content": "add reply",
+                    "State": 0,
+                    "CreatedAt": "2021-11-17T17:26:26+08:00"
+                    }
+                }    
+            }
+        }
+```
+
+# 审核回复
+```
+	uri:/admin/review/reply
+    query:
+        {
+            "commentId": 1,
+            "state": false
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
