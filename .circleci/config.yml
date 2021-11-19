@@ -59,7 +59,7 @@ jobs:
             fi
             rsync -avce ssh ~/cpg-blog/ $ROOT@$IP_ADDRESS:/data/cpg-blog
             ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/; go build main.go"
-            ssh $ROOT@$IP_ADDRESS "cd /data/cpg-blog/cmd/cpg/ && nohup ./main >./gin.log 2>&1 &"
+            ssh $ROOT@$IP_ADDRESS "nohup /data/cpg-blog/cmd/cpg/main > /data/cpg-blog/cmd/cpg/gin.log 2>&1 &"
             ssh $ROOT@$IP_ADDRESS "ps -elf | grep main"
             else
             echo "Not master branch, dry run only"
