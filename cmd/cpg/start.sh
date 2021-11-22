@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2009
 # shellcheck disable=SC2126
+# shellcheck disable=SC2006
 
-num=$(ps -elf | grep main | wc -l)
-if [ "${num}" -gt 1 ]; then
+num=`ps -elf | grep main | wc -l`
+one=1
+if [ $num -gt $one ]; then
 killall main
 else
 echo "start deploy"
