@@ -11,7 +11,7 @@ type ReviewArticleQO struct {
 	/*
 		文章sn号
 	*/
-	Sn int64 `binding:"required"`
+	Sn string `binding:"required"`
 
 	/*
 		审核状态（通过/不通过 => true/false）

@@ -9,6 +9,7 @@ import (
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"strconv"
 )
 
 /**
@@ -78,10 +79,10 @@ func (v Review) ReplyReviewFailedList(ctx *gin.Context) {
 
 func (v Review) ReviewArticle(ctx *gin.Context, query *qo.ReviewArticleQO) {
 	util.JsonConvert(ctx, query)
-
+	sn, _ := strconv.ParseInt(query.Sn, 10, 64)
 	//根据sn查询相关文章
-	articleMap := articleCommonFunc.ArticleCommonFunc{}.FindArticlesBySn(ctx, []int64{query.Sn})
-	if _, ok := articleMap[query.Sn]; !ok {
+	articleMap := articleCommonFunc.ArticleCommonFunc{}.FindArticlesBySn(ctx, []int64{sn})
+	if _, ok := articleMap[sn]; !ok {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
 		return
 	}
@@ -90,7 +91,7 @@ func (v Review) ReviewArticle(ctx *gin.Context, query *qo.ReviewArticleQO) {
 	if query.State {
 		state = published
 	}
-	err := articleCommonFunc.ArticleCommonFunc{}.UpdateArticle(query.Sn, state)
+	err := articleCommonFunc.ArticleCommonFunc{}.UpdateArticle(sn, state)
 	if err != nil {
 		common.SendResponse(ctx, err, "")
 		return

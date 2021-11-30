@@ -32,7 +32,7 @@ type ArticleInfoQO struct {
 	/*
 		文章sn号
 	*/
-	Sn int64 `binding:"required"`
+	Sn string `binding:"required"`
 }
 
 type Article struct {
@@ -110,7 +110,7 @@ type UpdateArticleQO struct {
 	/*
 		文章id，关联扩展表aid
 	*/
-	Sn int64 `json:"sn" binding:"required"`
+	Sn string `json:"sn" binding:"required"`
 	/*
 		文章标题
 	*/

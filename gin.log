@@ -1,0 +1,5 @@
+[GIN] 2021/11/29 - 18:02:17 | 200 |     7.49925ms |             ::1 | POST     "/admin/auth/role/add/permission"
+[GIN] 2021/11/29 - 18:02:37 | 200 |   98.880166ms |             ::1 | POST     "/admin/auth/role/add/permission"
+[GIN] 2021/11/29 - 18:03:21 | 200 |  206.788959ms |             ::1 | POST     "/admin/auth/role/add/permission"
+[GIN] 2021/11/29 - 18:04:40 | 200 |    244.0835ms |             ::1 | POST     "/admin/auth/role/add/permission"
+[GIN] 2021/11/29 - 18:06:15 | 200 |  217.834875ms |             ::1 | POST     "/admin/article/add"

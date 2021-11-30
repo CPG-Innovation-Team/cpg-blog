@@ -88,11 +88,12 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 func (c Comment) List(ctx *gin.Context) {
 	listQO := qo.ListQO{}
 	util.JsonConvert(ctx, &listQO)
+	sn, _ := strconv.ParseInt(listQO.Sn, 10, 64)
 	listMap := make(map[int]vo.CommentListVO)
 
 	//通过sn查询文章所有评论，生成以floor为key,listVO为value
 	var comments []model.Comment
-	globalInit.Db.Model(model.Comment{}).Where("sn", listQO.Sn).Find(&comments)
+	globalInit.Db.Model(model.Comment{}).Where("sn", sn).Find(&comments)
 	if len(comments) == 0 {
 		common.SendResponse(ctx, common.OK, listMap)
 		return
@@ -127,6 +128,7 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	addQO := new(qo.AddCommentQO)
 	util.JsonConvert(ctx, addQO)
+	sn, _ := strconv.ParseInt(addQO.Sn, 10, 64)
 	commentVO := vo.AddCommentVO{}
 
 	if addQO.Content == "" {
@@ -143,8 +145,8 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//查询文章是否存在
 	articleMap := articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		FindPublishedArticlesBySn(ctx, []int64{addQO.Sn})
-	if article, ok := articleMap[addQO.Sn]; !ok || article.State != cpgConst.ONE {
+		FindPublishedArticlesBySn(ctx, []int64{sn})
+	if article, ok := articleMap[sn]; !ok || article.State != cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, commentVO)
 		return
 	}
@@ -153,14 +155,14 @@ func (c Comment) Add(ctx *gin.Context) {
 	var floor int
 	globalInit.Db.Model(&comment).
 		Select("floor").
-		Where("sn", addQO.Sn).
+		Where("sn", sn).
 		Order("floor desc").
 		First(&floor)
 
 	//插入评论
 	//TODO 后续增加审核功能
 	comment.State = cpgConst.ZERO
-	comment.Sn = addQO.Sn
+	comment.Sn = sn
 	comment.Content = addQO.Content
 	comment.Floor = floor + cpgConst.ONE
 
@@ -175,7 +177,7 @@ func (c Comment) Add(ctx *gin.Context) {
 
 	//更新文章扩展表评论数
 	err = articleCommonFunc.IArticle(articleCommonFunc.ArticleCommonFunc{}).
-		UpdateArticleEx(ctx, addQO.Sn, false, true, false, true)
+		UpdateArticleEx(ctx, sn, false, true, false, true)
 	if err != nil {
 		common.SendResponse(ctx, err, commentVO)
 		return
