@@ -118,7 +118,7 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	//根据PName查询策略字段
 	hasPermission := e.GetFilteredNamedGroupingPolicy("g2", 1, gap.PName)
 	if len(hasPermission) > 0 {
-		hasPolicy, err := e.AddPolicy(cpgConst.RolePrefix+gap.RName, gap.PName)
+		hasPolicy, err := e.AddPolicy(cpgConst.RolePrefix+gap.RName, gap.PName, cpgConst.Operate)
 
 		if err != nil {
 			common.SendResponse(ctx, common.ErrDatabase, "添加失败"+err.Error())

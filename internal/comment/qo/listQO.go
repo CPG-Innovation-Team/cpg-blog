@@ -8,5 +8,5 @@ package qo
 
 type ListQO struct {
 	//文章sn号
-	Sn int64 `binding:"required"`
+	Sn string `binding:"required"`
 }

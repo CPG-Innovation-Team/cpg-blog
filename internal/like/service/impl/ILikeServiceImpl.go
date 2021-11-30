@@ -30,9 +30,10 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 func isLike(ctx *gin.Context, isCancelLike bool) (e error) {
 	likeQO := new(qo.LikeQO)
 	util.JsonConvert(ctx, likeQO)
+	sn,_ := strconv.ParseInt(likeQO.Sn, 10, 64)
 
-	if (likeQO.Sn == zero64 && likeQO.CommentId == zero) ||
-		(likeQO.Sn != zero64 && likeQO.CommentId != zero) {
+	if (sn == zero64 && likeQO.CommentId == zero) ||
+		(sn != zero64 && likeQO.CommentId != zero) {
 		common.SendResponse(ctx, common.ErrParam, "")
 	}
 	token, _ := tokenInfo(ctx)
@@ -42,11 +43,11 @@ func isLike(ctx *gin.Context, isCancelLike bool) (e error) {
 	var err error
 
 	// 点赞/取消点赞文章
-	if likeQO.Sn != zero64 {
+	if sn != zero64 {
 		if !isCancelLike {
-			err = likeArticle(likeQO.Sn, uid)
+			err = likeArticle(sn, uid)
 		} else if isCancelLike {
-			err = cancelLikeArticle(likeQO.Sn, uid)
+			err = cancelLikeArticle(sn, uid)
 		}
 
 		if err != nil {

@@ -173,7 +173,7 @@
 	uri:/admin/article/update
     query:
         {
-            "sn":1, //必传
+            "sn":"1", //必传
             "title": "update22",
             "cover": "update22",
             "content": "update222",
@@ -201,7 +201,7 @@
             "message": "message",
             "data":   
                 {
-                    "sn":12323
+                    "sn":"12323"
                     "title": "hello",
                     "author":"chen",
                     "cover": "ddddd",
@@ -280,7 +280,7 @@
 
 # 查询所有权限
 ```
-	uri:/auth/query/permissions
+	uri:/admin/auth/query/permissions
     query:
         {}
     response:
@@ -426,7 +426,7 @@
 	uri:/like
     query: //点赞,参数不允许同时为空/存在，二选一
         {
-            "sn":1967400744308736,
+            "sn":"1967400744308736",
             "comment_id":0
         }
     response:
@@ -442,7 +442,7 @@
 	uri:/like/cancel
     query: //取消点赞,参数不允许同时为空/存在，二选一
         {
-            "sn":1967400744308736,
+            "sn":"1967400744308736",
             "comment_id":0
         }
     response:

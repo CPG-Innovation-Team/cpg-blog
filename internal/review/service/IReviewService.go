@@ -31,11 +31,11 @@ type IVerify interface {
 	ReplyReviewFailedList(ctx *gin.Context)
 
 	// ReviewArticle 审核新增的文章
-	ReviewArticle(ctx *gin.Context, qo qo.ReviewArticleQO)
+	ReviewArticle(ctx *gin.Context, qo *qo.ReviewArticleQO)
 
 	//ReviewComment 审核新增的评论
-	ReviewComment(ctx *gin.Context, qo qo.ReviewCommentQO)
+	ReviewComment(ctx *gin.Context, qo *qo.ReviewCommentQO)
 
 	//ReviewReply 审核新增的评论回复
-	ReviewReply(ctx *gin.Context, qo qo.ReviewReplyQO)
+	ReviewReply(ctx *gin.Context, qo *qo.ReviewReplyQO)
 }

@@ -71,6 +71,7 @@ func (a Article) Info(ctx *gin.Context) {
 	if err := copier.Copy(article, infoQO); err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
 	}
+	article.Sn, _ = strconv.ParseInt(infoQO.Sn, 10, 64)
 	article = new(dao.ArticleDAO).SelectBySn(ctx, article)
 
 	if article.Aid == 0 {
@@ -82,6 +83,7 @@ func (a Article) Info(ctx *gin.Context) {
 	if err := copier.Copy(&articleVO, article); err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
 	}
+	articleVO.Sn = strconv.FormatInt(article.Sn,10)
 	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
 	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
 	articleVO.Author = userMap[uint(article.Uid)].UserName
@@ -166,9 +168,10 @@ func (a Article) Add(ctx *gin.Context) {
 func (a Article) Delete(ctx *gin.Context) {
 	deleteQO := new(qo.ArticleInfoQO)
 	util.JsonConvert(ctx, deleteQO)
+	sn, _ := strconv.ParseInt(deleteQO.Sn, 10, 64)
 	var articleList []model.Article
 
-	tx := globalInit.Db.Where("sn", deleteQO.Sn).Find(&articleList)
+	tx := globalInit.Db.Where("sn", sn).Find(&articleList)
 
 	if len(articleList) == 0 {
 		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
@@ -203,7 +206,9 @@ func (a Article) Update(ctx *gin.Context) {
 		return
 	}
 	updateDAO := new(dao.ArticleDAO)
-	copier.Copy(updateDAO, updateQO)
+	_ = copier.Copy(updateDAO, updateQO)
+	sn, _ := strconv.ParseInt(updateQO.Sn, 10, 64)
+	updateDAO.Sn = sn
 	oldArticle := &model.Article{}
 
 	//校验文章是否存在
