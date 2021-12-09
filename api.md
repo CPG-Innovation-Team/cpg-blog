@@ -298,7 +298,7 @@
 
 # 查询所有角色
 ```
-	uri:/auth/query/roles
+	uri:/admin/auth/query/roles
     query:
         {}
     response:
@@ -314,7 +314,7 @@
 
 # 添加单个权限
 ```
-	uri:/auth/add/permission
+	uri:/admin/auth/add/permission
     query:
         {    
         "pName": "权限4",
@@ -330,7 +330,7 @@
 
 # 删除单个权限
 ```
-	uri:/auth/delete/permission
+	uri:/admin/auth/delete/permission
     query:
         {    
         "pName": "权限4"
@@ -345,7 +345,7 @@
 
 # 新增角色
 ```
-	uri:/auth/add/role
+	uri:/admin/auth/add/role
     query:
         {    
         "rName": "角色名"
@@ -360,7 +360,7 @@
 
 # 角色添加权限
 ```
-	uri:/auth/role/add/permission
+	uri:/admin/auth/role/add/permission
     query:
         {
         "rName": "角色名",
@@ -376,7 +376,7 @@
 
 # 用户添加角色
 ```
-	uri:/auth/role/add/user
+	uri:/admin/auth/role/add/user
     query:
         {
         "rName": "角色名",
@@ -392,7 +392,7 @@
 
 # 用户删除角色
 ```
-	uri:/auth/role/remove/user
+	uri:/admin/auth/role/remove/user
     query:
         {
         "rName": "角色名",
@@ -408,7 +408,7 @@
 
 # 删除角色
 ```
-	uri:/auth/delete/role
+	uri:/admin/auth/delete/role
     query:
         {
         "rName": "角色名"
@@ -455,7 +455,7 @@
 
 # 新增评论
 ```
-	uri:/comment/add
+	uri:/admin/comment/add
     query: //必填
         {
             "sn":1967400744308736,
@@ -473,7 +473,7 @@
 
 # 删除评论
 ```
-	uri:/comment/delete
+	uri:/admin/comment/delete
     query: //必填
         {
             "commentId":1967400744308736
@@ -616,7 +616,7 @@
 	uri:/admin/review/article
     query:
         {
-          "sn":21828941648556032,
+          "sn":"21828941648556032",
           "state": false
         }
     response:
