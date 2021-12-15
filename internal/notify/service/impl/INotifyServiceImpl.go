@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"strconv"
 	"time"
 )
 
@@ -28,16 +29,36 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 	util.JsonConvert(ctx, query)
 
 	//判断通知类型，若类型为4则uid默认为0;其余情况需将UID转换进行校验
-	if query.Type == cpgConst.FOUR && len(query.Uid) > 1 && query.Uid[0] != cpgConst.ZERO {
+	if query.Type == cpgConst.FOUR && len(query.Uid) > 1 {
+		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	} else if query.Type == cpgConst.FOUR {
+		query.Uid = []int{cpgConst.ZERO}
+	}
+
+	//校验时间
+	nowTime := time.Now()
+	beginTimeInt,_ := strconv.ParseInt(query.BeginTime,10,64)
+	endTimeInt,_ := strconv.ParseInt(query.EndTime,10,64)
+	begin := time.Unix(beginTimeInt,0)
+	end := time.Unix(endTimeInt,0)
+	if end.Before(begin) || end.Before(nowTime){
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
 
-	//将uid列表、content、state、notify_date写入model
-	notifyDao := new(dao.NotifyDao)
+	//将uid列表、content、state、beginTime、endTime写入model
+	notifyDao := new(dao.Notify)
 	uidByte, _ := json.Marshal(query.Uid)
+	content, _ := json.Marshal(query.Content)
+
 	_ = copier.Copy(notifyDao, query)
+
 	notifyDao.Uid = string(uidByte)
+	notifyDao.Content = string(content)
+	notifyDao.BeginTime = begin
+	notifyDao.EndTime = end
+
 
 	//model写入数据库
 	id, err := notifyDao.Creat(ctx)
@@ -54,12 +75,12 @@ func (Notify) UpdateNotification(ctx *gin.Context, query *qo.UpdateNotificationQ
 	util.JsonConvert(ctx, query)
 
 	//判断通知类型，若类型为4则uid默认为0;其余情况需将UID转换进行校验
-	if query.Type == cpgConst.FOUR && len(query.Uid) > 1 && query.Uid[0] != cpgConst.ZERO {
+	if query.Type == cpgConst.FOUR && len(query.Uid) > 1 {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
 
-	notifyDao := new(dao.NotifyDao)
+	notifyDao := new(dao.Notify)
 
 	//查询id是否存在记录
 	result := globalInit.Db.Model(&model.Notify{}).Where("id", query.Id).Find(notifyDao)
@@ -68,10 +89,27 @@ func (Notify) UpdateNotification(ctx *gin.Context, query *qo.UpdateNotificationQ
 		return
 	}
 
-	//将uid列表、content、state、notify_date写入model
+	//校验时间
+	nowTime := time.Now()
+	beginTimeInt,_ := strconv.ParseInt(query.BeginTime,10,64)
+	endTimeInt,_ := strconv.ParseInt(query.EndTime,10,64)
+	begin := time.Unix(beginTimeInt,0)
+	end := time.Unix(endTimeInt,0)
+	if end.Before(begin) || end.Before(nowTime){
+		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	}
+
+	//将uid列表、content、state、beginTime、endTime写入model
 	uidByte, _ := json.Marshal(query.Uid)
+	content, _ := json.Marshal(query.Content)
+
 	_ = copier.Copy(notifyDao, query)
+
 	notifyDao.Uid = string(uidByte)
+	notifyDao.Content = string(content)
+	notifyDao.BeginTime = begin
+	notifyDao.EndTime = end
 
 	//更新
 	err := notifyDao.Update(ctx)
@@ -89,8 +127,8 @@ func (Notify) SystemNotify(ctx *gin.Context) {
 	globalInit.Db.Model(&model.Notify{}).
 		Where("type", cpgConst.FOUR).
 		Where("state", cpgConst.ONE).
-		Where("end_date > ?", time.Now()).
-		Find(result.NotificationList)
+		Where("end_time > ?", time.Now()).
+		Find(&result.NotificationList)
 	if len(result.NotificationList) == cpgConst.ZERO {
 		err := common.OK
 		err.Message = "当前时间段暂无通知"
