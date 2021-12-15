@@ -1,7 +1,5 @@
 package qo
 
-import "time"
-
 /**
   @author: chenxi@cpgroup.cn
   @date:2021/12/8
@@ -23,10 +21,10 @@ type AddNotificationQO struct {
 	State int
 
 	// 通知开始时间
-	BeginTime time.Time
+	BeginTime string
 
 	// 通知结束时间
-	EndTime time.Time
+	EndTime string
 }
 
 // UpdateNotificationQO 更新通知请求参数
@@ -47,8 +45,8 @@ type UpdateNotificationQO struct {
 	State int
 
 	// 通知开始时间
-	BeginTime time.Time
+	BeginTime string
 
 	// 通知结束时间
-	EndTime time.Time
+	EndTime string
 }

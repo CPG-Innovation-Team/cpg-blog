@@ -14,9 +14,9 @@ import (
   @description: 仅对cpg_blog_notify表进行操作
 **/
 
-type NotifyDao model.Notify
+type Notify model.Notify
 
-func (n NotifyDao) BeforeCreate(tx *gorm.DB) (err error) {
+func (n Notify) BeforeCreate(tx *gorm.DB) (err error) {
 	result := tx.Find(&n)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -24,7 +24,7 @@ func (n NotifyDao) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (n NotifyDao) BeforeUpdate(tx *gorm.DB) (err error) {
+func (n Notify) BeforeUpdate(tx *gorm.DB) (err error) {
 	result := tx.Find(&n)
 	if result.RowsAffected != 0 {
 		return result.Error
@@ -32,7 +32,7 @@ func (n NotifyDao) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (n NotifyDao) Creat(ctx *gin.Context) (id int, err error) {
+func (n Notify) Creat(ctx *gin.Context) (id int, err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
@@ -47,7 +47,7 @@ func (n NotifyDao) Creat(ctx *gin.Context) (id int, err error) {
 	return n.Id, err
 }
 
-func (n NotifyDao) Update(ctx *gin.Context) (err error) {
+func (n Notify) Update(ctx *gin.Context) (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
