@@ -21,4 +21,3 @@ type INotify interface {
 	// SystemNotify 查询通知内容
 	SystemNotify(ctx *gin.Context)
 }
-

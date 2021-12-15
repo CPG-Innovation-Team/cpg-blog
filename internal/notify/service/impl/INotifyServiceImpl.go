@@ -38,11 +38,11 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 
 	//校验时间
 	nowTime := time.Now()
-	beginTimeInt,_ := strconv.ParseInt(query.BeginTime,10,64)
-	endTimeInt,_ := strconv.ParseInt(query.EndTime,10,64)
-	begin := time.Unix(beginTimeInt,0)
-	end := time.Unix(endTimeInt,0)
-	if end.Before(begin) || end.Before(nowTime){
+	beginTimeInt, _ := strconv.ParseInt(query.BeginTime, 10, 64)
+	endTimeInt, _ := strconv.ParseInt(query.EndTime, 10, 64)
+	begin := time.Unix(beginTimeInt, 0)
+	end := time.Unix(endTimeInt, 0)
+	if end.Before(begin) || end.Before(nowTime) {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
@@ -58,7 +58,6 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 	notifyDao.Content = string(content)
 	notifyDao.BeginTime = begin
 	notifyDao.EndTime = end
-
 
 	//model写入数据库
 	id, err := notifyDao.Creat(ctx)
@@ -91,11 +90,11 @@ func (Notify) UpdateNotification(ctx *gin.Context, query *qo.UpdateNotificationQ
 
 	//校验时间
 	nowTime := time.Now()
-	beginTimeInt,_ := strconv.ParseInt(query.BeginTime,10,64)
-	endTimeInt,_ := strconv.ParseInt(query.EndTime,10,64)
-	begin := time.Unix(beginTimeInt,0)
-	end := time.Unix(endTimeInt,0)
-	if end.Before(begin) || end.Before(nowTime){
+	beginTimeInt, _ := strconv.ParseInt(query.BeginTime, 10, 64)
+	endTimeInt, _ := strconv.ParseInt(query.EndTime, 10, 64)
+	begin := time.Unix(beginTimeInt, 0)
+	end := time.Unix(endTimeInt, 0)
+	if end.Before(begin) || end.Before(nowTime) {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}

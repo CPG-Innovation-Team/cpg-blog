@@ -754,3 +754,72 @@
             "data":{}
         }
 ```
+
+# 添加通知
+```
+	uri:/admin/notify/add
+    query:
+        {
+        "type": 4, //文章相关-1，点赞相关-2，评论相关-3，系统通知-4，其他-5
+        "content": "test",
+        "uid":[], //通知类型为4时默认填充0，其余情况需要绑定用户ID列表
+        "state": 1,//通知状态（默认为0）：关闭-0，开启-1'
+        "beginTime": "1639411200",
+        "endTime": "1639497599"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+                "id":3
+            }
+        }
+```
+
+# 更新通知
+```
+	uri:/admin/notify/update
+    query:
+        {
+        "id": 5
+        "type": 4,
+        "content": "test",
+        "uid":[],
+        "state": 1,
+        "beginTime": "1639411200",
+        "endTime": "1639497599"
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 查询通知
+```
+	uri:/admin/notify/query
+    query:{}
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{
+            "NotificationList": [
+                {
+                "Id": 5,
+                "Type": 4,
+                "Uid": "[0]",
+                "Content": "\"test\"",
+                "State": 1,
+                "BeginTime": "2021-12-15T00:00:00+08:00",
+                "EndTime": "2021-12-15T23:59:59+08:00",
+                "CreatedAt": "2021-12-14T12:27:10+08:00",
+                "UpdatedAt": "2021-12-15T10:45:35+08:00"
+                }
+            ]
+            }
+        }    
+```
