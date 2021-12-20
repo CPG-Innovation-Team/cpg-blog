@@ -1,0 +1,16 @@
+syntax = "proto3";
+package test_grpc;
+
+option go_package="./";
+
+service Tester{
+  rpc MyTester(Request) returns(Response){}
+}
+
+message Request{
+  string name = 1;
+}
+message Response{
+  string sex = 1;
+  string age = 2;
+}

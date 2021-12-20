@@ -1,1 +1,2 @@
-[GIN] 2021/12/15 - 10:50:09 | 200 |  123.319875ms |             ::1 | POST     "/admin/notify/query"
+[GIN] 2021/12/20 - 17:16:35 | 500 |   12.199334ms |             ::1 | POST     "/article/list"
+[GIN] 2021/12/20 - 17:17:52 | 200 |   84.825583ms |             ::1 | POST     "/article/list"

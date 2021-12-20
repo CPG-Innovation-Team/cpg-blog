@@ -10,7 +10,7 @@ type Controller struct{}
 var article = &impl.Article{}
 
 // RegisterRoute 添加article服务路由
-func (u Controller) RegisterRoute(g *gin.RouterGroup) {
+func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 	articleGroup := g.Group("/article")
 
 	//查询文章详情
@@ -27,4 +27,10 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 
 	//更新文章
 	articleGroup.POST("/update", article.Update)
+}
+
+func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup) {
+	articleGroup := g.Group("/article")
+	//未登录查询文章列表
+	articleGroup.POST("/list", article.List)
 }
