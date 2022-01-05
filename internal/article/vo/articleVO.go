@@ -59,7 +59,7 @@ type ArticleDetail struct {
 	/*
 		文章sn号
 	*/
-	Sn int64
+	Sn string
 
 	/*
 		文章标题
