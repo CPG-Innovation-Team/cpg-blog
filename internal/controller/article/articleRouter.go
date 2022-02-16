@@ -33,4 +33,7 @@ func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup) {
 	articleGroup := g.Group("/article")
 	//未登录查询文章列表
 	articleGroup.POST("/list", article.List)
+
+	//未登录查询文章详情
+	articleGroup.POST("/info", article.Info)
 }
