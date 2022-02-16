@@ -19,9 +19,6 @@ var notify = &impl.Notify{}
 func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 	notifyGroup := g.Group("/notify")
 
-	//查询系统通知
-	notifyGroup.POST("/query", notify.SystemNotify)
-
 	//新增通知
 	notifyGroup.POST("/add", func(context *gin.Context) {
 		query := new(qo.AddNotificationQO)
@@ -33,4 +30,11 @@ func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 		query := new(qo.UpdateNotificationQO)
 		notify.UpdateNotification(context, query)
 	})
+}
+
+func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup){
+	notifyGroup := g.Group("/notify")
+
+	//查询系统通知
+	notifyGroup.POST("/query", notify.SystemNotify)
 }
