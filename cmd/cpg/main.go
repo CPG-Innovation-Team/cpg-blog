@@ -61,8 +61,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	//err := s.ListenAndServe()
-	rootPath := globalInit.App.RootDir
-	err := s.ListenAndServeTLS(rootPath+"/cmd/cpg/server.crt", rootPath+"/cmd/cpg/server.key")
+	err := s.ListenAndServeTLS("/etc/ssl/certs/cpgroup.top_bundle.crt", "/etc/ssh/cpgroup.top.key")
 	if err != nil {
 		return
 	}

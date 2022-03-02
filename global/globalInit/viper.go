@@ -27,6 +27,7 @@ func ViperInit() {
 		rand.Seed(time.Now().UnixNano())
 
 		//配置文件名称
+		fmt.Print(*config)
 		viper.SetConfigName(*config)
 		viper.SetConfigType("toml")
 		//配置文件查找路径

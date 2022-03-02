@@ -93,7 +93,7 @@ func inferRootDir() string {
 
 func (a *app) FillBuildInfo(gitCommitLog, buildTime, gitRelease string) {
 	App.Name = viper.GetString("name")
-	App.Domain = viper.GetString("domain")
+	App.Domain = viper.GetString("domain") + viper.GetString("http.port")
 	App.Desc = viper.GetStringMapString("desc")
 
 	a.Build.GitCommitLog = gitCommitLog
