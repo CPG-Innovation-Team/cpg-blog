@@ -130,7 +130,7 @@ func (Notify) SystemNotify(ctx *gin.Context) {
 		Find(&result.NotificationList)
 	if len(result.NotificationList) == cpgConst.ZERO {
 		err := common.OK
-		err.Message = "当前时间段暂"
+		err.Message = "当前时间段暂无通知"
 		common.SendResponse(ctx, err, "")
 		return
 	}
