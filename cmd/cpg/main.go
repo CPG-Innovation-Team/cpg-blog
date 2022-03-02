@@ -60,7 +60,8 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	err := s.ListenAndServe()
+	//err := s.ListenAndServe()
+	err := s.ListenAndServeTLS("./cmd/cpg/server.crt","./cmd/cpg/server.key")
 	if err != nil {
 		return
 	}
