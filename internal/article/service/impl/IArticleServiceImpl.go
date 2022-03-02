@@ -70,6 +70,7 @@ func (a Article) Info(ctx *gin.Context) {
 
 	if err := copier.Copy(article, infoQO); err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
+		return
 	}
 	article.Sn, _ = strconv.ParseInt(infoQO.Sn, 10, 64)
 	article = new(dao.ArticleDAO).SelectBySn(ctx, article)
@@ -82,6 +83,7 @@ func (a Article) Info(ctx *gin.Context) {
 	articleVO := vo.ArticleInfoVO{}
 	if err := copier.Copy(&articleVO, article); err != nil {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
+		return
 	}
 	articleVO.Sn = strconv.FormatInt(article.Sn,10)
 	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
@@ -90,6 +92,7 @@ func (a Article) Info(ctx *gin.Context) {
 	articleVO.CreateAt = article.CreatedAt.Unix()
 	articleVO.UpdatedAt = article.UpdatedAt.Unix()
 	common.SendResponse(ctx, common.OK, articleVO)
+	return
 }
 
 func (a Article) List(ctx *gin.Context) {
@@ -131,6 +134,7 @@ func (a Article) List(ctx *gin.Context) {
 		articleList[k].Author = userMap[v.Uid].UserName
 	}
 	common.SendResponse(ctx, common.OK, articleVO)
+	return
 }
 
 func (a Article) Add(ctx *gin.Context) {
@@ -163,6 +167,7 @@ func (a Article) Add(ctx *gin.Context) {
 	}
 	resp := vo.AddArticleVO{Sn: article.Sn}
 	common.SendResponse(ctx, common.OK, resp)
+	return
 }
 
 func (a Article) Delete(ctx *gin.Context) {
@@ -190,6 +195,7 @@ func (a Article) Delete(ctx *gin.Context) {
 
 	tx.Update("state", deleted).Commit()
 	common.SendResponse(ctx, common.OK, "")
+	return
 }
 
 func (a Article) Update(ctx *gin.Context) {
@@ -239,6 +245,7 @@ func (a Article) Update(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, "")
+	return
 }
 
 //func (a Article) UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error {

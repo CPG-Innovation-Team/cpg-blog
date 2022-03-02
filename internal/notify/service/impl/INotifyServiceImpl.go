@@ -135,4 +135,5 @@ func (Notify) SystemNotify(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, result)
+	return
 }
