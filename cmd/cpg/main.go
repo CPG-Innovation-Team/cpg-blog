@@ -42,7 +42,7 @@ func main() {
 	controller.RegisterSpecialRoutes(special)
 
 	//门户页
-	portal:=r.Group("")
+	portal := r.Group("")
 	portal.Use(middleware.JwtAuth)
 	controller.RegisterPortalRoutes(portal)
 
@@ -61,7 +61,8 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	//err := s.ListenAndServe()
-	err := s.ListenAndServeTLS("./cmd/cpg/server.crt","./cmd/cpg/server.key")
+	rootPath := globalInit.App.RootDir
+	err := s.ListenAndServeTLS(rootPath+"/cmd/cpg/server.crt", rootPath+"/cmd/cpg/server.key")
 	if err != nil {
 		return
 	}
