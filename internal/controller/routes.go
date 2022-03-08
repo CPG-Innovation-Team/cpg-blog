@@ -19,6 +19,7 @@ func RegisterSpecialRoutes(g *gin.RouterGroup) {
 	new(user.Controller).RegisterSpecialRoute(g)
 	new(article.Controller).RegisterSpecialRoute(g)
 	new(notify.Controller).RegisterSpecialRoute(g)
+	new(comment.Controller).RegisterSpecialRoute(g)
 }
 
 // RegisterPortalRoutes 统一注册portal路由
