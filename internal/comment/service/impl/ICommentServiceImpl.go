@@ -13,6 +13,7 @@ import (
 	"cpg-blog/pkg/commonFunc/likeCommonFunc"
 	"cpg-blog/pkg/commonFunc/userCommonFunc"
 	"cpg-blog/pkg/util"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"reflect"
@@ -99,15 +100,36 @@ func (c Comment) List(ctx *gin.Context) {
 		return
 	}
 
+	uidList := make([]int, 10)
+
 	for _, v := range comments {
 		commentInfo := listMap[v.Floor]
 		_ = copier.Copy(&commentInfo, &v)
-
+		uidList = append(uidList, int(commentInfo.UID))
 		//根据cid查询comment下所有的回复
 		globalInit.Db.Model(model.CommentReply{}).Where("cid = ? and state = ?", v.Cid, cpgConst.ONE).Find(&commentInfo.ReplyList)
 
+		for _, rv := range commentInfo.ReplyList {
+			uidList = append(uidList, int(rv.UID))
+		}
+
 		listMap[v.Floor] = commentInfo
 	}
+
+	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, uidList, "", "")
+
+	for k, v := range listMap {
+		commentInfo := listMap[k]
+		commentInfo.NickName = userMap[v.UID].Nickname
+		if len(v.ReplyList) > cpgConst.ZERO {
+			for _, rv := range commentInfo.ReplyList {
+				rv.NickName = userMap[rv.UID].Nickname
+			}
+		}
+		listMap[k] = commentInfo
+	}
+
+	fmt.Print(listMap)
 
 	common.SendResponse(ctx, common.OK, listMap)
 }
