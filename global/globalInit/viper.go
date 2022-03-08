@@ -12,6 +12,7 @@ import (
 var (
 	once = new(sync.Once)
 	config = flag.String("config", "config", "配置文件名称，默认 config")
+	LocalDebug = flag.Bool("local", false, "本地启动，默认 false")
 	Base    int
 )
 

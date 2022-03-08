@@ -24,6 +24,7 @@ func init() {
 	globalInit.App.SetFrameMode(gin.ReleaseMode)
 	globalInit.App.FillBuildInfo(gitCommitLog, buildTime, gitRelease)
 	globalInit.App.SetLog(viper.GetBool("log.isStdout"))
+
 }
 
 func main() {
@@ -61,7 +62,13 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	//err := s.ListenAndServe()
-	err := s.ListenAndServeTLS("/etc/ssl/certs/cpgroup.top_bundle.crt", "/etc/ssh/cpgroup.top.key")
+	var err error
+	if *globalInit.LocalDebug{
+		err = s.ListenAndServe()
+	} else {
+		err = s.ListenAndServeTLS("/etc/ssl/certs/cpgroup.top_bundle.crt", "/etc/ssh/cpgroup.top.key")
+	}
+
 	if err != nil {
 		return
 	}
