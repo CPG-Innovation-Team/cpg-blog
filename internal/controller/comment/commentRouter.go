@@ -13,9 +13,6 @@ var comment = &impl.Comment{}
 func (c Controller) RegisterRoute(g *gin.RouterGroup)  {
 	commentGroup := g.Group("/comment")
 
-	//文章所有评论及关系
-	commentGroup.POST("/list", comment.List)
-
 	//填写评论
 	commentGroup.POST("/add", comment.Add)
 
@@ -27,4 +24,10 @@ func (c Controller) RegisterRoute(g *gin.RouterGroup)  {
 
 	//删除回复
 	commentGroup.POST("/reply/delete", comment.DeleteReply)
+}
+
+func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup) {
+	commentGroup := g.Group("/comment")
+	//文章所有评论及关系
+	commentGroup.POST("/list", comment.List)
 }
