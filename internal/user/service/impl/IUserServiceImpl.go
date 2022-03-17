@@ -230,8 +230,15 @@ func (u Users) Modify(ctx *gin.Context) {
 		return
 	}
 
+	encodePassWd, _ := u.encryption(user.Passwd)
+	user.Passwd = encodePassWd
+
 	if err := new(dao.UserDAO).UpdateUserInfo(ctx, &user); err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err.Error())
 		return
 	}
+
+
+	common.SendResponse(ctx, common.OK, "修改成功")
+	return
 }

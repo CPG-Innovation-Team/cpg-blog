@@ -10,6 +10,7 @@ import (
 	"cpg-blog/internal/article/vo"
 	"cpg-blog/internal/user/service"
 	"cpg-blog/middleware/jwt"
+	"cpg-blog/pkg/commonFunc/likeCommonFunc"
 	"cpg-blog/pkg/commonFunc/userCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -85,7 +86,20 @@ func (a Article) Info(ctx *gin.Context) {
 		common.SendResponse(ctx, common.ErrBind, err.Error())
 		return
 	}
-	articleVO.Sn = strconv.FormatInt(article.Sn,10)
+
+	//查询是否点赞
+	token, err := tokenInfo(ctx)
+	if err != nil {
+		common.SendResponse(ctx, err, "")
+		return
+	}
+	uid, _ := strconv.Atoi(token.Uid)
+	err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ZERO, article.Sn)
+	if zanInfo.State != cpgConst.ONE && err == common.OK {
+		articleVO.ZanState = true
+	}
+
+	articleVO.Sn = strconv.FormatInt(article.Sn, 10)
 	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
 	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
 	articleVO.Author = userMap[uint(article.Uid)].UserName
