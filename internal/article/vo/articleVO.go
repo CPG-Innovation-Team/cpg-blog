@@ -45,6 +45,11 @@ type ArticleInfoVO struct {
 	State int
 
 	/*
+		点赞状态 true-已点赞， false-未点赞
+	*/
+	ZanState bool
+
+	/*
 		创建时间
 	*/
 	CreateAt int64

@@ -33,6 +33,9 @@ type CommentListVO struct {
 	//状态：0-未审核;1-已上线;2-下线(审核拒绝);3-用户删除
 	State int
 
+	//点赞状态 true-已点赞， false-未点赞
+	ZanState bool
+
 	CreatedAt time.Time
 
 	ReplyList []ReplyVO

@@ -120,9 +120,23 @@ func (c Comment) List(ctx *gin.Context) {
 
 	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, uidList, "", "")
 
+	//查询登陆用户uid
+	tokenInfo, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
+	if err != nil {
+		common.SendResponse(ctx, err, "")
+		return
+	}
+	uid, _ := strconv.Atoi(tokenInfo.Uid)
+
 	for k, v := range listMap {
 		commentInfo := listMap[k]
 		commentInfo.NickName = userMap[v.UID].Nickname
+
+		err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ONE, int64(v.Cid))
+		if zanInfo.State != cpgConst.ONE && err == common.OK {
+			commentInfo.ZanState = true
+		}
+
 		if v.ReplyList != nil {
 			for rk := range commentInfo.ReplyList {
 				commentInfo.ReplyList[rk].NickName = userMap[commentInfo.ReplyList[rk].UID].Nickname
@@ -266,7 +280,7 @@ func (c Comment) Delete(ctx *gin.Context) {
 	}
 
 	//点赞表更改评论点赞状态
-	err = likeCommonFunc.ILike(likeCommonFunc.LikeCommonFunc{}).
+	err = likeCommonFunc.LikeCommonFunc{}.
 		UpdateZanSate(ctx, comment.Sn, cpgConst.ONE)
 	if err != nil {
 		common.SendResponse(ctx, err, "")

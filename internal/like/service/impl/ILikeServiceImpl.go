@@ -30,7 +30,7 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 func isLike(ctx *gin.Context, isCancelLike bool) (e error) {
 	likeQO := new(qo.LikeQO)
 	util.JsonConvert(ctx, likeQO)
-	sn,_ := strconv.ParseInt(likeQO.Sn, 10, 64)
+	sn, _ := strconv.ParseInt(likeQO.Sn, 10, 64)
 
 	if (sn == zero64 && likeQO.CommentId == zero) ||
 		(sn != zero64 && likeQO.CommentId != zero) {
