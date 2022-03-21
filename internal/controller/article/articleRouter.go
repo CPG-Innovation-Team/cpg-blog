@@ -14,7 +14,7 @@ func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 	articleGroup := g.Group("/article")
 
 	//查询文章详情
-	articleGroup.POST("/info", article.Info)
+	articleGroup.POST("/info", article.LoginAndQueryArticleInfo)
 
 	//查询文章列表
 	articleGroup.POST("/list", article.List)
@@ -35,5 +35,5 @@ func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup) {
 	articleGroup.POST("/list", article.List)
 
 	//未登录查询文章详情
-	articleGroup.POST("/info", article.Info)
+	articleGroup.POST("/info", article.UnlistedQueryArticleInfo)
 }

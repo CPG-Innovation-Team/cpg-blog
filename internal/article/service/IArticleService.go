@@ -8,6 +8,12 @@ type IArticle interface {
 	//Info 查询文章详情
 	Info(ctx *gin.Context)
 
+	//UnlistedQuery 未登录查询文章详情
+	UnlistedQueryArticleInfo(ctx *gin.Context)
+
+	//LoginAndQuery 登陆查询文章详情
+	LoginAndQueryArticleInfo(ctx *gin.Context)
+
 	// List 搜索文章
 	List(ctx *gin.Context)
 
