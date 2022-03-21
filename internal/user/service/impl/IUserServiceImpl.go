@@ -176,6 +176,7 @@ func (u Users) Register(ctx *gin.Context) {
 		}
 		loginVo := vo.LoginVo{
 			Token: token,
+			Uid: int(user1[0].UID),
 		}
 		common.SendResponse(ctx, common.OK, loginVo)
 	}

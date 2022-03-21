@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"log"
+	"reflect"
 	"strconv"
 )
 
@@ -43,25 +44,67 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	return
 }
 
-//func (a Article) FindPublishedArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article) {
-//	var articles []model.Article
-//	articles = []model.Article{}
-//	articlesMap = map[int64]model.Article{}
-//
-//	tx := globalInit.Db.WithContext(ctx).Model(&model.Article{})
-//	if len(sn) == cpgConst.ONE {
-//		tx.Where("sn", sn[0])
-//	}
-//
-//	if len(sn) > cpgConst.ONE {
-//		tx.Where("sn In", sn)
-//	}
-//	tx.Where("state", cpgConst.ONE).Find(&articles)
-//	for _, v := range articles {
-//		articlesMap[v.Sn] = v
-//	}
-//	return articlesMap
-//}
+// Info 根据sn查询
+func Info(ctx *gin.Context)(*gin.Context, error, interface{}){
+	infoQO := new(qo.ArticleInfoQO)
+	util.JsonConvert(ctx, infoQO)
+	article := new(model.Article)
+
+	if err := copier.Copy(article, infoQO); err != nil {
+		return ctx, common.ErrBind, err.Error()
+
+	}
+	article.Sn, _ = strconv.ParseInt(infoQO.Sn, 10, 64)
+	article = new(dao.ArticleDAO).SelectBySn(ctx, article)
+
+	if article.Aid == 0 {
+		return ctx, common.ErrArticleNotExisted, ""
+
+	}
+
+	articleVO := vo.ArticleInfoVO{}
+	if err := copier.Copy(&articleVO, article); err != nil {
+		return ctx, common.ErrBind, err.Error()
+	}
+	
+	articleVO.Sn = strconv.FormatInt(article.Sn, 10)
+	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
+	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
+	articleVO.Author = userMap[uint(article.Uid)].UserName
+	articleVO.CreateAt = article.CreatedAt.Unix()
+	articleVO.UpdatedAt = article.UpdatedAt.Unix()
+	return ctx, common.OK, articleVO
+}
+
+func (a Article) UnlistedQueryArticleInfo(ctx *gin.Context)  {
+	ctx, err, data := Info(ctx)
+	common.SendResponse(ctx, err, data)
+	return
+}
+
+func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context)  {
+	ctx, err, data := Info(ctx)
+	//查询是否点赞
+	token, err := tokenInfo(ctx)
+	if err != nil {
+		common.SendResponse(ctx, err, "")
+		return
+	}
+	uid, _ := strconv.Atoi(token.Uid)
+	articleVO := vo.ArticleInfoVO{}
+	if reflect.TypeOf(data) == reflect.TypeOf(vo.ArticleInfoVO{}) && data != nil{
+		_ = copier.Copy(&articleVO, data)
+		sn, _ := strconv.ParseInt(articleVO.Sn, 10, 64)
+		err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ZERO, sn)
+		if zanInfo.State != cpgConst.ONE && err == common.OK {
+			articleVO.ZanState = true
+		}
+	}
+
+	common.SendResponse(ctx, err, articleVO)
+	return
+}
+
 
 // Info 根据sn查询
 func (a Article) Info(ctx *gin.Context) {
