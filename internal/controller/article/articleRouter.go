@@ -36,4 +36,7 @@ func (c Controller) RegisterSpecialRoute(g *gin.RouterGroup) {
 
 	//未登录查询文章详情
 	articleGroup.POST("/info", article.UnlistedQueryArticleInfo)
+
+	//查询热门文章
+	articleGroup.POST("/popular/list",article.PopularArticlesList)
 }

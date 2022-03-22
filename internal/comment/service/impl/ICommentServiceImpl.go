@@ -122,19 +122,23 @@ func (c Comment) List(ctx *gin.Context) {
 
 	//查询登陆用户uid
 	tokenInfo, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
-	if err != nil {
-		common.SendResponse(ctx, err, "")
-		return
+	var uid int
+	if err == nil {
+		//common.SendResponse(ctx, err, "")
+		//return
+		uid, _ = strconv.Atoi(tokenInfo.Uid)
 	}
-	uid, _ := strconv.Atoi(tokenInfo.Uid)
+	//uid, _ := strconv.Atoi(tokenInfo.Uid)
 
 	for k, v := range listMap {
 		commentInfo := listMap[k]
 		commentInfo.NickName = userMap[v.UID].Nickname
 
-		err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ONE, int64(v.Cid))
-		if zanInfo.State != cpgConst.ONE && err == common.OK {
-			commentInfo.ZanState = true
+		if uid != cpgConst.ZERO{
+			err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ONE, int64(v.Cid))
+			if zanInfo.State != cpgConst.ONE && err == common.OK {
+				commentInfo.ZanState = true
+			}
 		}
 
 		if v.ReplyList != nil {

@@ -15,6 +15,8 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
+	"log"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -138,6 +140,15 @@ func (u Users) Register(ctx *gin.Context) {
 	//校验必填请求参数
 	util.JsonConvert(ctx, &registerQO)
 
+	//密码限制8-32位字母、数字、特殊符号
+	matched, _ := regexp.MatchString("^[\\Sa-zA-Z0-9]{8,32}", registerQO.Passwd)
+
+	if !matched {
+		log.Println("密码格式错误，匹配结果：", matched)
+		common.SendResponse(ctx, common.ErrPasswordIncorrect, "")
+		return
+	}
+
 	//校验唯一参数username、email
 	users := new(dao.UserDAO).SelectByNameAndEmail(ctx, &model.User{UserName: registerQO.UserName, Email: registerQO.Email})
 	if 0 < len(users) {
@@ -176,7 +187,7 @@ func (u Users) Register(ctx *gin.Context) {
 		}
 		loginVo := vo.LoginVo{
 			Token: token,
-			Uid: int(user1[0].UID),
+			Uid:   int(user1[0].UID),
 		}
 		common.SendResponse(ctx, common.OK, loginVo)
 	}
@@ -238,7 +249,6 @@ func (u Users) Modify(ctx *gin.Context) {
 		common.SendResponse(ctx, common.ErrDatabase, err.Error())
 		return
 	}
-
 
 	common.SendResponse(ctx, common.OK, "修改成功")
 	return

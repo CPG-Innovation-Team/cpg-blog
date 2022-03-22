@@ -8,10 +8,10 @@ type IArticle interface {
 	//Info 查询文章详情
 	Info(ctx *gin.Context)
 
-	//UnlistedQuery 未登录查询文章详情
+	//UnlistedQueryArticleInfo 未登录查询文章详情
 	UnlistedQueryArticleInfo(ctx *gin.Context)
 
-	//LoginAndQuery 登陆查询文章详情
+	//LoginAndQueryArticleInfo 登陆查询文章详情
 	LoginAndQueryArticleInfo(ctx *gin.Context)
 
 	// List 搜索文章
@@ -26,9 +26,6 @@ type IArticle interface {
 	// Update 更新文章
 	Update(ctx *gin.Context)
 
-	// UpdateArticleEx 服务间更新文章扩展信息
-	//UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error
-
-	// FindPublishedArticlesBySn 服务间查询文章信息，支持list
-	//FindPublishedArticlesBySn(ctx *gin.Context, sn []int64) (articlesMap map[int64]model.Article)
+	//PopularArticlesList 热门文章，默认四篇
+	PopularArticlesList(ctx *gin.Context)
 }

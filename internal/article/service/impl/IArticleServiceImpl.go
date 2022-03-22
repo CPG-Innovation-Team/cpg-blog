@@ -45,7 +45,7 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 }
 
 // Info 根据sn查询
-func Info(ctx *gin.Context)(*gin.Context, error, interface{}){
+func Info(ctx *gin.Context) (*gin.Context, error, interface{}) {
 	infoQO := new(qo.ArticleInfoQO)
 	util.JsonConvert(ctx, infoQO)
 	article := new(model.Article)
@@ -66,7 +66,7 @@ func Info(ctx *gin.Context)(*gin.Context, error, interface{}){
 	if err := copier.Copy(&articleVO, article); err != nil {
 		return ctx, common.ErrBind, err.Error()
 	}
-	
+
 	articleVO.Sn = strconv.FormatInt(article.Sn, 10)
 	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
 	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
@@ -76,13 +76,13 @@ func Info(ctx *gin.Context)(*gin.Context, error, interface{}){
 	return ctx, common.OK, articleVO
 }
 
-func (a Article) UnlistedQueryArticleInfo(ctx *gin.Context)  {
+func (a Article) UnlistedQueryArticleInfo(ctx *gin.Context) {
 	ctx, err, data := Info(ctx)
 	common.SendResponse(ctx, err, data)
 	return
 }
 
-func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context)  {
+func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context) {
 	ctx, err, data := Info(ctx)
 	//查询是否点赞
 	token, err := tokenInfo(ctx)
@@ -92,7 +92,7 @@ func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context)  {
 	}
 	uid, _ := strconv.Atoi(token.Uid)
 	articleVO := vo.ArticleInfoVO{}
-	if reflect.TypeOf(data) == reflect.TypeOf(vo.ArticleInfoVO{}) && data != nil{
+	if reflect.TypeOf(data) == reflect.TypeOf(vo.ArticleInfoVO{}) && data != nil {
 		_ = copier.Copy(&articleVO, data)
 		sn, _ := strconv.ParseInt(articleVO.Sn, 10, 64)
 		err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ZERO, sn)
@@ -104,7 +104,6 @@ func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context)  {
 	common.SendResponse(ctx, err, articleVO)
 	return
 }
-
 
 // Info 根据sn查询
 func (a Article) Info(ctx *gin.Context) {
@@ -305,6 +304,37 @@ func (a Article) Update(ctx *gin.Context) {
 	return
 }
 
-//func (a Article) UpdateArticleEx(ctx *gin.Context, sn int64, view bool, cmt bool, zan bool, add bool) error {
-//	return dao.ArticleDAO{}.UpdateArticleEx(sn, view, cmt, zan, add)
-//}
+func (a Article) PopularArticlesList(ctx *gin.Context) {
+	listQO := qo.PopularArticleQO{}
+	util.JsonConvert(ctx, &listQO)
+	listQO.Page.PageNum = cpgConst.ONE
+	listQO.Page.PageSize = cpgConst.FOUR
+
+	articleDAO := new(dao.ArticleDAO)
+
+	countBool := func(a, b, c bool) (count int) {
+		if a {
+			count++
+		}
+		if b {
+			count++
+		}
+		if c {
+			count++
+		}
+		return count
+	}
+
+	if countBool(listQO.CmtNum, listQO.ZanNum, listQO.ViewNum) != cpgConst.ONE {
+		common.SendResponse(ctx, common.ErrParam, "顺序不能同时为true")
+	}
+	_ = copier.Copy(articleDAO, listQO)
+	articleVO := articleDAO.FindArticles(ctx)
+	articleList := articleVO.ArticleDetailList
+	for k, v := range articleList {
+		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{int(v.Uid)}, "", "")
+		articleList[k].Author = userMap[v.Uid].UserName
+	}
+	common.SendResponse(ctx, common.OK, articleVO)
+	return
+}
