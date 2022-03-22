@@ -136,3 +136,26 @@ type UpdateArticleQO struct {
 	*/
 	State string `json:"state" binding:"required"`
 }
+
+//PopularArticleQO 热门文章
+type PopularArticleQO struct {
+	/*
+		浏览量排序，默认asc
+	*/
+	ViewNum bool `json:"view_num"`
+
+	/*
+		评论数排序，默认asc
+	*/
+	CmtNum bool `json:"cmt_num"`
+
+	/*
+		点赞数排序，默认asc
+	*/
+	ZanNum bool `json:"zan_num"`
+
+	/*
+		分页
+	*/
+	Page common.PageQO `form:"page" json:"page"`
+}
