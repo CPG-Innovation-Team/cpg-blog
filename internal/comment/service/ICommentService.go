@@ -17,7 +17,4 @@ type IComment interface {
 
 	// DeleteReply 删除回复
 	DeleteReply(ctx *gin.Context)
-
-	// UpdateCommentZan 服务间更新点赞信息
-	//UpdateCommentZan(cid int, isAdd bool) (err error)
 }

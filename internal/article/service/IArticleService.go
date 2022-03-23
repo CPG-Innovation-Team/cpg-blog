@@ -5,8 +5,6 @@ import (
 )
 
 type IArticle interface {
-	//Info 查询文章详情
-	Info(ctx *gin.Context)
 
 	//UnlistedQueryArticleInfo 未登录查询文章详情
 	UnlistedQueryArticleInfo(ctx *gin.Context)

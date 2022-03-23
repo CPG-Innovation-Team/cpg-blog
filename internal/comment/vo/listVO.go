@@ -21,6 +21,9 @@ type CommentListVO struct {
 	//评论用户昵称
 	NickName string
 
+	//评论用户头像
+	Avatar string
+
 	//评论内容
 	Content string
 
@@ -53,6 +56,9 @@ type ReplyVO struct {
 
 	//回复用户昵称
 	NickName string
+
+	//回复用户头像
+	Avatar string
 
 	//回复内容
 	Content string

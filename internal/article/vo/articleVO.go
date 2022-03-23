@@ -20,9 +20,14 @@ type ArticleInfoVO struct {
 	Title string
 
 	/*
-		作者
+		作者昵称
 	*/
 	Author string
+
+	/*
+		作者头像
+	 */
+	Avatar string
 
 	/*
 		文章封面图地址
@@ -77,9 +82,14 @@ type ArticleDetail struct {
 	Uid uint
 
 	/*
-		作者
+		作者昵称
 	*/
 	Author string
+
+	/*
+		作者头像
+	*/
+	Avatar string
 
 	/*
 		文章封面图地址
