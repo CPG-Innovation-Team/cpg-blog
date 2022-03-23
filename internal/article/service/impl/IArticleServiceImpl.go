@@ -68,9 +68,9 @@ func Info(ctx *gin.Context) (*gin.Context, error, interface{}) {
 	}
 
 	articleVO.Sn = strconv.FormatInt(article.Sn, 10)
-	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
 	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
-	articleVO.Author = userMap[uint(article.Uid)].UserName
+	articleVO.Author = userMap[uint(article.Uid)].Nickname
+	articleVO.Avatar = userMap[uint(article.Uid)].Avatar
 	articleVO.CreateAt = article.CreatedAt.Unix()
 	articleVO.UpdatedAt = article.UpdatedAt.Unix()
 	return ctx, common.OK, articleVO
@@ -105,58 +105,12 @@ func (a Article) LoginAndQueryArticleInfo(ctx *gin.Context) {
 	return
 }
 
-// Info 根据sn查询
-func (a Article) Info(ctx *gin.Context) {
-	infoQO := new(qo.ArticleInfoQO)
-	util.JsonConvert(ctx, infoQO)
-	article := new(model.Article)
-
-	if err := copier.Copy(article, infoQO); err != nil {
-		common.SendResponse(ctx, common.ErrBind, err.Error())
-		return
-	}
-	article.Sn, _ = strconv.ParseInt(infoQO.Sn, 10, 64)
-	article = new(dao.ArticleDAO).SelectBySn(ctx, article)
-
-	if article.Aid == 0 {
-		common.SendResponse(ctx, common.ErrArticleNotExisted, "")
-		return
-	}
-
-	articleVO := vo.ArticleInfoVO{}
-	if err := copier.Copy(&articleVO, article); err != nil {
-		common.SendResponse(ctx, common.ErrBind, err.Error())
-		return
-	}
-
-	//查询是否点赞
-	token, err := tokenInfo(ctx)
-	if err != nil {
-		common.SendResponse(ctx, err, "")
-		return
-	}
-	uid, _ := strconv.Atoi(token.Uid)
-	err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ZERO, article.Sn)
-	if zanInfo.State != cpgConst.ONE && err == common.OK {
-		articleVO.ZanState = true
-	}
-
-	articleVO.Sn = strconv.FormatInt(article.Sn, 10)
-	//userMap := userService.FindUser(ctx, []int{article.Uid}, "", "")
-	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{article.Uid}, "", "")
-	articleVO.Author = userMap[uint(article.Uid)].UserName
-	articleVO.CreateAt = article.CreatedAt.Unix()
-	articleVO.UpdatedAt = article.UpdatedAt.Unix()
-	common.SendResponse(ctx, common.OK, articleVO)
-	return
-}
-
 func (a Article) List(ctx *gin.Context) {
 	listQuery := new(qo.ArticleListQO)
 	util.JsonConvert(ctx, listQuery)
 	articleDAO := new(dao.ArticleDAO)
-	copier.Copy(articleDAO, listQuery)
-	copier.Copy(articleDAO, listQuery.Article)
+	_ = copier.Copy(articleDAO, listQuery)
+	_ = copier.Copy(articleDAO, listQuery.Article)
 
 	log.Println("请求参数:", listQuery)
 	log.Println("articleDAO:", articleDAO)
@@ -176,8 +130,8 @@ func (a Article) List(ctx *gin.Context) {
 		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{articleDAO.Uid}, "", "")
 		articleList := articleVO.ArticleDetailList
 		for k, v := range articleVO.ArticleDetailList {
-			articleList[k].Author = userMap[v.Uid].UserName
-			//v.Author = userMap[uint(articleDAO.Uid)].UserName
+			articleList[k].Author = userMap[v.Uid].Nickname
+			articleList[k].Avatar = userMap[v.Uid].Avatar
 		}
 		common.SendResponse(ctx, common.OK, articleVO)
 		return
@@ -185,9 +139,9 @@ func (a Article) List(ctx *gin.Context) {
 	articleVO := articleDAO.FindArticles(ctx)
 	articleList := articleVO.ArticleDetailList
 	for k, v := range articleList {
-		//userMap := userService.FindUser(ctx, []int{int(v.Uid)}, "", "")
 		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{int(v.Uid)}, "", "")
-		articleList[k].Author = userMap[v.Uid].UserName
+		articleList[k].Author = userMap[v.Uid].Nickname
+		articleList[k].Avatar = userMap[v.Uid].Avatar
 	}
 	common.SendResponse(ctx, common.OK, articleVO)
 	return
@@ -333,7 +287,8 @@ func (a Article) PopularArticlesList(ctx *gin.Context) {
 	articleList := articleVO.ArticleDetailList
 	for k, v := range articleList {
 		userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, []int{int(v.Uid)}, "", "")
-		articleList[k].Author = userMap[v.Uid].UserName
+		articleList[k].Author = userMap[v.Uid].Nickname
+		articleList[k].Avatar = userMap[v.Uid].Avatar
 	}
 	common.SendResponse(ctx, common.OK, articleVO)
 	return

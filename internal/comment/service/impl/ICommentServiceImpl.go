@@ -46,37 +46,6 @@ func (c Comment) tokenInfo(ctx *gin.Context) (info *jwt.CustomClaims, err error)
 	return jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 }
 
-//UpdateCommentZan
-/**
-* @Author: ethan.chen@cpgroup.cn
-* @Date: 2021/10/13 15:22
-* @Description: 其他服务更新评论点赞信息
-* @Params: cid int, isAdd bool
-* @Return: error
-**/
-//func (c Comment) UpdateCommentZan(cid int, isAdd bool) (err error) {
-//	comment := model.Comment{}
-//	globalInit.Db.Where("cid = ? and state = ?", cid, cpgConst.ONE).Find(&comment)
-//
-//	if reflect.DeepEqual(model.Comment{}, comment) {
-//		e := common.ErrParam
-//		e.Message = "Not Find Comment Or Comment Not Online"
-//		return e
-//	}
-//	if !isAdd && comment.ZanNum == cpgConst.ZERO {
-//		return nil
-//	}
-//
-//	zanNum := comment.ZanNum
-//	if isAdd {
-//		zanNum += cpgConst.ONE
-//	} else {
-//		zanNum -= cpgConst.ONE
-//	}
-//
-//	return dao.Comment{}.UpdateCommentZan(cid, zanNum)
-//}
-
 //List
 /**
 * @Author: ethan.chen@cpgroup.cn
@@ -124,15 +93,13 @@ func (c Comment) List(ctx *gin.Context) {
 	tokenInfo, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
 	var uid int
 	if err == nil {
-		//common.SendResponse(ctx, err, "")
-		//return
 		uid, _ = strconv.Atoi(tokenInfo.Uid)
 	}
-	//uid, _ := strconv.Atoi(tokenInfo.Uid)
 
 	for k, v := range listMap {
 		commentInfo := listMap[k]
 		commentInfo.NickName = userMap[v.UID].Nickname
+		commentInfo.Avatar = userMap[v.UID].Avatar
 
 		if uid != cpgConst.ZERO{
 			err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ONE, int64(v.Cid))
@@ -144,6 +111,7 @@ func (c Comment) List(ctx *gin.Context) {
 		if v.ReplyList != nil {
 			for rk := range commentInfo.ReplyList {
 				commentInfo.ReplyList[rk].NickName = userMap[commentInfo.ReplyList[rk].UID].Nickname
+				commentInfo.ReplyList[rk].Avatar = userMap[commentInfo.ReplyList[rk].UID].Avatar
 			}
 		}
 		listMap[k] = commentInfo
