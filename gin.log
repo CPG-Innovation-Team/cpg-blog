@@ -1,0 +1,2 @@
+[GIN] 2022/03/23 - 16:48:44 | 200 |   65.332542ms |             ::1 | POST     "/article/popular/list"
+[GIN] 2022/03/23 - 16:49:15 | 200 |   61.768875ms |             ::1 | POST     "/article/popular/list"

@@ -279,10 +279,13 @@ func (a Article) PopularArticlesList(ctx *gin.Context) {
 		return count
 	}
 
+	log.Println(listQO.CmtNum, listQO.ZanNum, listQO.ViewNum)
 	if countBool(listQO.CmtNum, listQO.ZanNum, listQO.ViewNum) != cpgConst.ONE {
-		common.SendResponse(ctx, common.ErrParam, "顺序不能同时为true")
+		common.SendResponse(ctx, common.ErrParam, "参数错误，参数中只能存在一个排序")
+		return
 	}
 	_ = copier.Copy(articleDAO, listQO)
+	articleDAO.State = cpgConst.ONE
 	articleVO := articleDAO.FindArticles(ctx)
 	articleList := articleVO.ArticleDetailList
 	for k, v := range articleList {

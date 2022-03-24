@@ -87,7 +87,20 @@ func (c Comment) List(ctx *gin.Context) {
 		listMap[v.Floor] = commentInfo
 	}
 
-	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, uidList, "", "")
+	//去重
+	deduplication := func(s []int) (result []int) {
+		m := make(map[int]bool)
+		for _, v := range s {
+			if !m[v] && v > cpgConst.ZERO {
+				result = append(result, v)
+				m[v] = true
+			}
+		}
+		return result
+	}
+	uList := deduplication(uidList)
+
+	userMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, uList, "", "")
 
 	//查询登陆用户uid
 	tokenInfo, err := jwt.NewJWT().ParseToken(ctx.Request.Header.Get("token"))
@@ -101,7 +114,7 @@ func (c Comment) List(ctx *gin.Context) {
 		commentInfo.NickName = userMap[v.UID].Nickname
 		commentInfo.Avatar = userMap[v.UID].Avatar
 
-		if uid != cpgConst.ZERO{
+		if uid != cpgConst.ZERO {
 			err, zanInfo := likeCommonFunc.LikeCommonFunc{}.CheckUserZanState(ctx, uid, cpgConst.ONE, int64(v.Cid))
 			if zanInfo.State != cpgConst.ONE && err == common.OK {
 				commentInfo.ZanState = true
