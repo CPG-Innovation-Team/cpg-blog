@@ -33,8 +33,9 @@ var (
 	ErrArticleNotExisted      = Errno{Code: 20104, Message: "The Article was not existed."}
 	ErrRoleExisted            = Errno{Code: 20105, Message: "The role was existed."}
 	ErrRoleNotExisted         = Errno{Code: 20106, Message: "The role was not existed."}
-	ErrPermissionNotExisted   = Errno{Code: 20107, Message: "The Permission was not existed."}
+	ErrAddPermission          = Errno{Code: 20107, Message: "Add Permission failed."}
 	ErrAccessDenied           = Errno{Code: 20108, Message: "Access denied."}
 	ErrUserExistedInRole      = Errno{Code: 20109, Message: "The user already exists in the role."}
 	ErrRelationshipNotExisted = Errno{Code: 20110, Message: "The relationship does not exist."}
+	ErrRemovePermission       = Errno{Code: 20111, Message: "Remove Permission failed."}
 )

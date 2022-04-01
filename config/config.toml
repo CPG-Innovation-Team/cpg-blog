@@ -62,3 +62,7 @@ expires = 1
 issuer = "CPG"
 # token主题
 subject = "cpg-blog-token"
+
+[defaultRole]
+# 注册普通用户时默认添加角色名
+ordinaryUser = "普通用户"

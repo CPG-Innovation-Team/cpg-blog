@@ -9,6 +9,7 @@ import (
 	"cpg-blog/internal/user/qo"
 	"cpg-blog/internal/user/vo"
 	jwt2 "cpg-blog/middleware/jwt"
+	"cpg-blog/pkg/commonFunc/authCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -165,6 +166,17 @@ func (u Users) Register(ctx *gin.Context) {
 		registerQO.Passwd = storePasswd
 		user := model.User{}
 		err = copier.Copy(&user, registerQO)
+
+		hasRole, err := authCommonFunc.AuthCommonFunc{}.SelectRole(viper.GetString("defaultRole.ordinaryUser"))
+		if !hasRole {
+			if err == common.ErrRoleNotExisted {
+				common.SendResponse(ctx, err, "用户添加角色失败！请联系管理员配置初始角色！")
+				return
+			}
+			common.SendResponse(ctx, err, "")
+			return
+		}
+
 		err = new(dao.UserDAO).Create(ctx, &user)
 		if err != nil {
 			common.SendResponse(ctx, common.ErrDatabase, err.Error())
@@ -172,9 +184,10 @@ func (u Users) Register(ctx *gin.Context) {
 		}
 
 		user1 := new(dao.UserDAO).SelectByName(ctx, registerQO.UserName)
+		uid := int(user1[0].UID)
 		//生成token
 		tokenInfo := tokenInfo{
-			int(user1[0].UID),
+			uid,
 			user1[0].UserName,
 			user1[0].Email,
 			user1[0].IsRoot,
@@ -185,11 +198,20 @@ func (u Users) Register(ctx *gin.Context) {
 			common.SendResponse(ctx, common.ErrGenerateToken, err.Error())
 			return
 		}
+
+		//添加配置角色
+		err = authCommonFunc.AuthCommonFunc{}.AddUserIntoRole(uid, viper.GetString("defaultRole.ordinaryUser"))
+		if err != common.OK {
+			common.SendResponse(ctx, err, "用户添加角色失败！请联系管理员配置初始角色！")
+			return
+		}
+
 		loginVo := vo.LoginVo{
 			Token: token,
-			Uid:   int(user1[0].UID),
+			Uid:   uid,
 		}
 		common.SendResponse(ctx, common.OK, loginVo)
+		return
 	}
 
 }

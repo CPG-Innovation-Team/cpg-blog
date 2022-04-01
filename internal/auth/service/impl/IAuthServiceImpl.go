@@ -109,6 +109,13 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	gap := new(qo.GroupAddPermissionQO)
 	util.JsonConvert(ctx, gap)
 
+	if len(gap.PName) < 1 || gap.RName == ""{
+		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	}
+
+	//policyList := strings.Join(gap.PName,", ")
+	//log.Println(policyList)
 	//校验角色
 	hasGroup := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+gap.RName)
 	if len(hasGroup) == 0 {
@@ -116,24 +123,42 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 		return
 	}
 	//根据PName查询策略字段
-	hasPermission := e.GetFilteredNamedGroupingPolicy("g2", 1, gap.PName)
-	if len(hasPermission) > 0 {
-		hasPolicy, err := e.AddPolicy(cpgConst.RolePrefix+gap.RName, gap.PName, cpgConst.Operate)
+	//hasPermission := e.GetFilteredNamedGroupingPolicy("g2", 1, policyList)
+	//log.Println(hasPermission)
 
-		if err != nil {
-			common.SendResponse(ctx, common.ErrDatabase, "添加失败"+err.Error())
-			return
+	var failureString string
+	for _, v := range gap.PName {
+		hasPolicy, _ := e.AddPolicy(cpgConst.RolePrefix+gap.RName, v, cpgConst.Operate)
+		if !hasPolicy{
+			var build strings.Builder
+			build.WriteString(failureString)
+			build.WriteString(v)
+			build.WriteString(" ")
+			failureString = build.String()
 		}
-		if !hasPolicy {
-			common.SendResponse(ctx, common.OK, "该角色已存在该权限")
-			return
-		}
-		common.SendResponse(ctx, nil, "添加成功")
-		return
-	} else {
-		common.SendResponse(ctx, common.ErrPermissionNotExisted, "")
+	}
+	if failureString != ""{
+		common.SendResponse(ctx, common.ErrAddPermission, "添加失败的权限为："+failureString)
 		return
 	}
+	common.SendResponse(ctx, common.OK, "权限添加成功")
+	return
+	//if len(hasPermission) > 0 {
+	//	hasPolicy, err := e.AddPolicy(cpgConst.RolePrefix+gap.RName, gap.PName, cpgConst.Operate)
+	//	if err != nil {
+	//		common.SendResponse(ctx, common.ErrDatabase, "添加失败"+err.Error())
+	//		return
+	//	}
+	//	if !hasPolicy {
+	//		common.SendResponse(ctx, common.OK, "该角色已存在该权限")
+	//		return
+	//	}
+	//	common.SendResponse(ctx, nil, "添加成功")
+	//	return
+	//} else {
+	//	common.SendResponse(ctx, common.ErrAddPermission, "")
+	//	return
+	//}
 }
 
 // AddUserIntoRole 添加用户-角色关联
@@ -143,7 +168,14 @@ func (a Auth) AddUserIntoRole(ctx *gin.Context) {
 	uid := strconv.Itoa(userIntoGroup.Uid)
 	e, _ := auth.GetE(ctx)
 
-	//TODO 校验角色是否存在
+	//TODO 校验uid
+
+	//校验角色是否存在
+	hasGroup := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+userIntoGroup.RName)
+	if len(hasGroup) == 0 {
+		common.SendResponse(ctx, common.ErrRoleNotExisted, "")
+		return
+	}
 
 	result, err := e.AddRoleForUser(cpgConst.UserPrefix+uid, cpgConst.RolePrefix+userIntoGroup.RName)
 	if err != nil {
@@ -168,7 +200,7 @@ func (a Auth) DeletePermission(ctx *gin.Context) {
 		return
 	}
 	if !result {
-		common.SendResponse(ctx, common.ErrPermissionNotExisted, "")
+		common.SendResponse(ctx, common.ErrRemovePermission, "")
 		return
 	}
 	_, err = e.RemoveFilteredNamedPolicy("p", 1, query.PName)
@@ -180,17 +212,28 @@ func (a Auth) DeleteRole(ctx *gin.Context) {
 	query := new(qo.DeleteRoleQO)
 	util.JsonConvert(ctx, query)
 	e, _ := auth.GetE(ctx)
-	result, err := e.RemoveFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+query.RName)
-	if !result {
-		common.SendResponse(ctx, common.ErrRoleNotExisted, "")
+	//result, err := e.RemoveFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+query.RName)
+	//if !result {
+	//	common.SendResponse(ctx, common.ErrRoleNotExisted, "")
+	//	return
+	//}
+	//if err != nil {
+	//	common.SendResponse(ctx, common.ErrDatabase, err)
+	//	return
+	//}
+	//_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+query.RName)
+	//common.SendResponse(ctx, common.OK, "")
+
+	if len(query.RName)<cpgConst.ONE{
+		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
-	if err != nil {
-		common.SendResponse(ctx, common.ErrDatabase, err)
-		return
+	for _, v := range query.RName {
+		_, _ = e.RemoveFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+v)
+		_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+v)
 	}
-	_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+query.RName)
 	common.SendResponse(ctx, common.OK, "")
+	return
 }
 
 // RoleRemoveUser 用户移除角色
