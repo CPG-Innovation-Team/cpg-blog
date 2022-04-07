@@ -1,1 +1,1 @@
-[GIN] 2022/04/01 - 15:25:24 | 200 |  271.046458ms |             ::1 | POST     "/register"
+[GIN] 2022/04/07 - 18:07:22 | 200 |  333.604542ms |             ::1 | POST     "/admin/auth/query/user/roles"

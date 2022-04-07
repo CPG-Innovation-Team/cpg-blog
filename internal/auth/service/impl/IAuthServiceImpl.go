@@ -5,6 +5,8 @@ import (
 	"cpg-blog/global/cpgConst"
 	"cpg-blog/internal/auth"
 	"cpg-blog/internal/auth/qo"
+	"cpg-blog/internal/auth/vo"
+	"cpg-blog/pkg/commonFunc/userCommonFunc"
 	"cpg-blog/pkg/util"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -109,7 +111,7 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	gap := new(qo.GroupAddPermissionQO)
 	util.JsonConvert(ctx, gap)
 
-	if len(gap.PName) < 1 || gap.RName == ""{
+	if len(gap.PName) < 1 || gap.RName == "" {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
@@ -129,7 +131,7 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	var failureString string
 	for _, v := range gap.PName {
 		hasPolicy, _ := e.AddPolicy(cpgConst.RolePrefix+gap.RName, v, cpgConst.Operate)
-		if !hasPolicy{
+		if !hasPolicy {
 			var build strings.Builder
 			build.WriteString(failureString)
 			build.WriteString(v)
@@ -137,7 +139,7 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 			failureString = build.String()
 		}
 	}
-	if failureString != ""{
+	if failureString != "" {
 		common.SendResponse(ctx, common.ErrAddPermission, "添加失败的权限为："+failureString)
 		return
 	}
@@ -224,7 +226,7 @@ func (a Auth) DeleteRole(ctx *gin.Context) {
 	//_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+query.RName)
 	//common.SendResponse(ctx, common.OK, "")
 
-	if len(query.RName)<cpgConst.ONE{
+	if len(query.RName) < cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
@@ -233,6 +235,53 @@ func (a Auth) DeleteRole(ctx *gin.Context) {
 		_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+v)
 	}
 	common.SendResponse(ctx, common.OK, "")
+	return
+}
+
+//GetUserRoles 查询用户角色
+func (a Auth) GetUserRoles(ctx *gin.Context) {
+	query := new(qo.GetUserRolesQO)
+	util.JsonConvert(ctx, query)
+	e, _ := auth.GetE(ctx)
+	var userRolesVo []vo.UserRolesVO
+
+	if len(query.Uid) < cpgConst.ZERO {
+		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	}
+
+	uMap := make(map[int]bool)
+	for _, v := range query.Uid {
+		if _, ok := uMap[v]; ok {
+			common.SendResponse(ctx, common.ErrParam, "uid存在重复!")
+			return
+		}
+		uMap[v] = true
+	}
+
+	getRole := func(s [][]string) (res []string) {
+		for _, v := range s {
+			res = append(res, strings.TrimPrefix(v[cpgConst.ONE], cpgConst.RolePrefix))
+		}
+		return res
+	}
+
+	for _, v := range query.Uid {
+		userRoles := e.GetFilteredNamedGroupingPolicy("g", cpgConst.ZERO, cpgConst.UserPrefix+strconv.Itoa(v))
+		log.Println(userRoles)
+		userRolesInfo := vo.UserRolesVO{
+			UserId:    v,
+			RoleNames: getRole(userRoles),
+		}
+		userRolesVo = append(userRolesVo, userRolesInfo)
+	}
+	userMap := userCommonFunc.UserCommonFunc{}.FindUser(ctx, query.Uid, "", "")
+
+	for k, v := range userRolesVo {
+		userRolesVo[k].UserName = userMap[uint(v.UserId)].Nickname
+	}
+
+	common.SendResponse(ctx, common.OK, userRolesVo)
 	return
 }
 
