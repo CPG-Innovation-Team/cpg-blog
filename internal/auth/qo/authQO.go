@@ -10,7 +10,7 @@ type AddRoleQO struct {
 }
 
 type GroupAddPermissionQO struct {
-	RName string `json:"rName" binding:"required"` //role name
+	RName string   `json:"rName" binding:"required"` //role name
 	PName []string `json:"pName" binding:"required"` //policy name
 }
 
@@ -27,7 +27,11 @@ type DeleteRoleQO struct {
 	RName []string `json:"rName" binding:"required"` //role name
 }
 
+type GetUserRolesQO struct {
+	Uid []int `json:"uid" binding:"required"`
+}
+
 type DeleteUserRoleQO struct {
-	Uid int `json:"uid" binding:"required"` //user id
+	Uid   int    `json:"uid" binding:"required"`   //user id
 	RName string `json:"rName" binding:"required"` //role name
 }

@@ -27,6 +27,9 @@ type IAuth interface {
 	// DeleteRole 删除角色，且解除角色与权限关联及角色与用户关联
 	DeleteRole(ctx *gin.Context)
 
+	//GetUserRoles 查询用户角色
+	GetUserRoles(ctx *gin.Context)
+
 	// RoleRemoveUser 用户移除角色
 	RoleRemoveUser(ctx *gin.Context)
 }
