@@ -29,6 +29,7 @@ func (a Auth) AllPolicies(ctx *gin.Context) {
 		}
 	}
 	common.SendResponse(ctx, common.OK, permissionMap)
+	return
 }
 
 // AllRoles 查询所有角色及其权限
@@ -67,6 +68,7 @@ func (a Auth) AllRoles(ctx *gin.Context) {
 	log.Println("角色与权限关系map:", roleMap)
 
 	common.SendResponse(ctx, common.OK, roleMap)
+	return
 }
 
 // AddPermission 系统添加单个权限
@@ -86,6 +88,7 @@ func (a Auth) AddPermission(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, "接口权限添加成功！")
+	return
 }
 
 // AddRole 添加角色
@@ -103,6 +106,7 @@ func (a Auth) AddRole(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, "")
+	return
 }
 
 // AddPermissionsForRole 角色添加权限
@@ -163,6 +167,38 @@ func (a Auth) AddPermissionsForRole(ctx *gin.Context) {
 	//}
 }
 
+// RemovePermissionsFromRole 角色移除权限
+func (a Auth) RemovePermissionsFromRole(ctx *gin.Context) {
+	query := new(qo.DeletePermissionFromRoleQO)
+	util.JsonConvert(ctx, query)
+	e, _ := auth.GetE(ctx)
+	//校验角色是否存在
+	role := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+query.RName)
+	if len(role) < cpgConst.ONE {
+		common.SendResponse(ctx, common.ErrRoleNotExisted, "")
+		return
+	}
+	//校验权限是否为空、重复
+	if len(query.PName) < cpgConst.ONE {
+		common.SendResponse(ctx, common.ErrParam, "权限不能为空！")
+		return
+	}
+	var permissionMap map[string]bool
+	for _, v := range query.PName {
+		if _, ok := permissionMap[v]; ok {
+			common.SendResponse(ctx, common.ErrParam, "权限参数存在重复值！")
+			return
+		}
+	}
+
+	//解除权限-角色关联
+	for _, v := range query.PName {
+		_, _ = e.RemoveFilteredNamedPolicy("p", 0, cpgConst.RolePrefix+query.RName, v)
+	}
+	common.SendResponse(ctx, common.OK, "")
+	return
+}
+
 // AddUserIntoRole 添加用户-角色关联
 func (a Auth) AddUserIntoRole(ctx *gin.Context) {
 	userIntoGroup := new(qo.AddUserIntoRoleQO)
@@ -189,6 +225,7 @@ func (a Auth) AddUserIntoRole(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, "")
+	return
 }
 
 // DeletePermission 移除权限，且解除权限-角色关联
@@ -207,6 +244,7 @@ func (a Auth) DeletePermission(ctx *gin.Context) {
 	}
 	_, err = e.RemoveFilteredNamedPolicy("p", 1, query.PName)
 	common.SendResponse(ctx, common.OK, err)
+	return
 }
 
 // DeleteRole 删除角色，且解除角色与权限关联及角色与用户关联
@@ -302,4 +340,5 @@ func (a Auth) RoleRemoveUser(ctx *gin.Context) {
 		return
 	}
 	common.SendResponse(ctx, common.OK, "")
+	return
 }

@@ -18,6 +18,9 @@ type IAuth interface {
 	// AddPermissionsForRole 角色添加权限
 	AddPermissionsForRole(ctx *gin.Context)
 
+	// RemovePermissionsFromRole 角色移除权限
+	RemovePermissionsFromRole(ctx *gin.Context)
+
 	// AddUserIntoRole 添加用户-角色关联
 	AddUserIntoRole(ctx *gin.Context)
 

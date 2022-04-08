@@ -31,6 +31,9 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	// AddPermissionsForGroup 角色添加权限
 	authGroup.POST("/role/add/permission", auth.AddPermissionsForRole)
 
+	// RemovePermissionsFromRole 角色删除权限
+	authGroup.POST("/role/remove/permission", auth.RemovePermissionsFromRole)
+
 	// AddUserIntoGroup 添加用户-用户组关联
 	authGroup.POST("/role/add/user", auth.AddUserIntoRole)
 
