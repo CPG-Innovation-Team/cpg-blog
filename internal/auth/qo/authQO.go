@@ -40,3 +40,14 @@ type DeleteUserRoleQO struct {
 	Uid   int    `json:"uid" binding:"required"`   //user id
 	RName string `json:"rName" binding:"required"` //role name
 }
+
+
+type UserAddRolesInBatches	struct {
+	Uid   int    `json:"uid" binding:"required"`
+	RName []string `json:"rName" binding:"required"`
+}
+
+type UserDeleteRolesInBatches	struct {
+	Uid   int    `json:"uid" binding:"required"`
+	RName []string `json:"rName" binding:"required"`
+}

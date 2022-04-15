@@ -237,13 +237,13 @@ func (u Users) List(ctx *gin.Context) {
 	var users []model.User
 	listQO := qo.UserListQO{}
 	util.JsonConvert(ctx, &listQO)
-	if listQO.State != one && listQO.State != two && listQO.State != there {
+	if listQO.State != cpgConst.ONE && listQO.State != cpgConst.TWO && listQO.State != cpgConst.THREE {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	}
 	globalInit.Db.Where("state", listQO.State).Find(&users)
 	var userList []vo.UserListVO
-	copier.Copy(&userList, &users)
+	_ = copier.Copy(&userList, &users)
 	common.SendResponse(ctx, common.OK, userList)
 }
 

@@ -22,7 +22,7 @@ type ReviewArticleQO struct {
 //ReviewCommentQO 审核评论请求参数
 type ReviewCommentQO struct {
 	//评论ID
-	CommentId int `binding:"required"`
+	CommentId []int `binding:"required"`
 
 	/*
 		审核状态（通过/不通过 => true/false）
@@ -33,7 +33,7 @@ type ReviewCommentQO struct {
 //ReviewReplyQO 审核评论回复请求参数
 type ReviewReplyQO struct {
 	//评论回复ID
-	ReplyId int `binding:"required"`
+	ReplyId []int `binding:"required"`
 
 	/*
 		审核状态（通过/不通过 => true/false）

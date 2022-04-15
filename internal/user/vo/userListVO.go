@@ -2,6 +2,10 @@ package vo
 
 // UserListVO 用户列表返回参数
 type UserListVO struct {
+
+	// 用户ID
+	UID int `json:"uid"`
+
 	/*
 		用户姓名（唯一）
 	*/

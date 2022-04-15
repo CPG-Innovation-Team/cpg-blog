@@ -21,9 +21,6 @@ type IAuth interface {
 	// RemovePermissionsFromRole 角色移除权限
 	RemovePermissionsFromRole(ctx *gin.Context)
 
-	// AddUserIntoRole 添加用户-角色关联
-	AddUserIntoRole(ctx *gin.Context)
-
 	// DeletePermission 移除权限，且解除权限-角色关联
 	DeletePermission(ctx *gin.Context)
 
@@ -33,6 +30,15 @@ type IAuth interface {
 	//GetUserRoles 查询用户角色
 	GetUserRoles(ctx *gin.Context)
 
+	// AddUserIntoRole 添加用户-角色关联
+	AddUserIntoRole(ctx *gin.Context)
+
+	// UserAddRolesInBatches 用户批量添加角色
+	UserAddRolesInBatches(ctx *gin.Context)
+
 	// RoleRemoveUser 用户移除角色
 	RoleRemoveUser(ctx *gin.Context)
+
+	// UserDeleteRolesInBatches 批量删除用户的角色
+	UserDeleteRolesInBatches(ctx *gin.Context)
 }

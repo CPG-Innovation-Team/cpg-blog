@@ -11,3 +11,7 @@ type UserRolesVO struct {
 	UserName  string   `json:"userName"`
 	RoleNames []string `json:"roleNames"`
 }
+
+type Roles struct {
+	RoleName []string `json:"roleName"`
+}

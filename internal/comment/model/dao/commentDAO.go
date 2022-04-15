@@ -101,13 +101,13 @@ func (c Comment) UpdateCommentZan(cid int, add int) (err error) {
 	return
 }
 
-func (c Comment) UpdateCommentState(cid int, state int) (err error) {
-	c.Cid = uint(cid)
+func (c Comment) UpdateCommentState(cid []int, state int) (err error) {
+	//c.Cid = uint(cid)
 
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Model(&c).Update("state", state)
+		tx.Model(&c).Where("cid in ?", cid).Update("state", state)
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()
 			return e
