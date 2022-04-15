@@ -122,12 +122,12 @@ func (c CommentReply) DeleteCommentReplyById(ctx *gin.Context) (err error) {
 	return
 }
 
-func (c CommentReply) UpdateCommentReplyStateByCid(id int, state int) (err error) {
-	c.Id = uint(id)
+func (c CommentReply) UpdateCommentReplyStateByCid(id []int, state int) (err error) {
+	//c.Id = uint(id)
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Model(&c).Update("state", state)
+		tx.Model(&c).Where("id in ?", id).Update("state", state)
 
 		if tx.Error != nil {
 			e.Message = tx.Error.Error()

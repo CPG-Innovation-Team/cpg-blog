@@ -16,6 +16,35 @@ import (
 
 type Auth struct{}
 
+//校验角色是否存在
+func checkRoles(ctx *gin.Context, roles []string) (roleMap map[string]bool) {
+	roleMap = make(map[string]bool)
+	e, _ := auth.GetE(ctx)
+	for _, v := range roles {
+		hasGroup := e.GetFilteredNamedGroupingPolicy("g", 1, cpgConst.RolePrefix+v)
+		if len(hasGroup) == cpgConst.ZERO {
+			roleMap[v] = false
+			continue
+		}
+		roleMap[v] = true
+	}
+	return
+}
+
+//校验用户是否存在
+func checkUsers(ctx *gin.Context, users []int) (userMap map[int]bool, err error) {
+	userMap = make(map[int]bool)
+	userModelMap := userCommonFunc.IUser(userCommonFunc.UserCommonFunc{}).FindUser(ctx, users, "", "")
+	for _, v := range users {
+		if userInfo, ok := userModelMap[uint(v)]; !ok || int(userInfo.State) != cpgConst.ONE {
+			userMap[v] = false
+			continue
+		}
+		userMap[v] = true
+	}
+	return
+}
+
 // AllPolicies 查询所有权限
 func (a Auth) AllPolicies(ctx *gin.Context) {
 	e, _ := auth.GetE(ctx)
@@ -338,6 +367,99 @@ func (a Auth) RoleRemoveUser(ctx *gin.Context) {
 	if err != nil {
 		common.SendResponse(ctx, common.ErrDatabase, err)
 		return
+	}
+	common.SendResponse(ctx, common.OK, "")
+	return
+}
+
+// UserAddRolesInBatches 用户批量添加角色
+func (a Auth) UserAddRolesInBatches(ctx *gin.Context) {
+	query := new(qo.UserAddRolesInBatches)
+	util.JsonConvert(ctx, query)
+
+	//校验参数
+	if cpgConst.ONE > len(query.RName) {
+		common.SendResponse(ctx, common.ErrParam, "角色不能为空！")
+		return
+	}
+
+	// 校验用户
+	userMap, _ := checkUsers(ctx, []int{query.Uid})
+	if !userMap[query.Uid] {
+		common.SendResponse(ctx, common.ErrParam, "用户不存在！")
+		return
+	}
+
+	//校验角色
+	roleListVo := vo.Roles{}
+	roleMap := checkRoles(ctx, query.RName)
+	log.Println("不存在的角色map：", roleMap)
+	for k, v := range roleMap {
+		if !v {
+			roleListVo.RoleName = append(roleListVo.RoleName, k)
+		}
+	}
+	log.Println("不存在的角色列表：", roleListVo.RoleName)
+	if cpgConst.ZERO < len(roleListVo.RoleName) {
+		e := common.ErrParam
+		e.Message = "角色不存在！"
+		common.SendResponse(ctx, e, roleListVo)
+		return
+	}
+
+	e, _ := auth.GetE(ctx)
+	uid := strconv.Itoa(query.Uid)
+	for _, v := range query.RName {
+		result, err := e.AddRoleForUser(cpgConst.UserPrefix+uid, cpgConst.RolePrefix+v)
+		if !result {
+			log.Printf("用户\"%s\"添加角色：%s失败,失败原因：\"%v\" ", uid, v, err)
+		}
+	}
+	common.SendResponse(ctx, common.OK, "")
+	return
+}
+
+// UserDeleteRolesInBatches 批量删除用户的角色
+func (a Auth) UserDeleteRolesInBatches(ctx *gin.Context) {
+	query := new(qo.UserDeleteRolesInBatches)
+	util.JsonConvert(ctx, query)
+
+	//校验参数
+	if cpgConst.ONE > len(query.RName) {
+		common.SendResponse(ctx, common.ErrParam, "角色不能为空！")
+		return
+	}
+
+	// 校验用户
+	userMap, _ := checkUsers(ctx, []int{query.Uid})
+	if !userMap[query.Uid] {
+		common.SendResponse(ctx, common.ErrParam, "用户不存在！")
+		return
+	}
+
+	//校验角色
+	roleListVo := vo.Roles{}
+	roleMap := checkRoles(ctx, query.RName)
+	for k, v := range roleMap {
+		if !v {
+			roleListVo.RoleName = append(roleListVo.RoleName, k)
+		}
+	}
+	if cpgConst.ZERO < len(roleListVo.RoleName) {
+		e := common.ErrParam
+		e.Message = "角色不存在！"
+		common.SendResponse(ctx, e, roleListVo)
+		return
+	}
+
+	e, _ := auth.GetE(ctx)
+	uid := strconv.Itoa(query.Uid)
+	for _, v := range query.RName {
+		result, err := e.RemoveFilteredNamedGroupingPolicy("g", 0,
+			cpgConst.UserPrefix+strconv.Itoa(query.Uid), cpgConst.RolePrefix+v)
+		if !result {
+			log.Printf("用户\"%s\"删除角色：\"%s\"失败,失败原因：\"%v\" ", uid, v, err)
+		}
 	}
 	common.SendResponse(ctx, common.OK, "")
 	return
