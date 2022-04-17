@@ -55,14 +55,22 @@ type Reply struct {
 	CreatedAt time.Time
 }
 
-type ReviewArticleVO struct {
+type ReviewArticleListVO struct {
 	ArticleMap map[int64]ReviewArticle
 }
 
-type ReviewCommentVO struct {
+type ReviewCommentListVO struct {
 	CommentMap map[uint]Comment
 }
 
-type ReviewReplyVO struct {
+type ReviewReplyListVO struct {
 	ReplyMap map[uint]Reply
+}
+
+type ReviewCommentVO struct {
+	CommentList []int
+}
+
+type ReviewReplyVO struct {
+	ReplyList []int
 }
