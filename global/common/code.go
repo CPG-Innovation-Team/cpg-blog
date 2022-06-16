@@ -19,10 +19,12 @@ var (
 	/*
 		system errors
 	*/
-	ErrValidation = Errno{Code: 20001, Message: "Validation failed."}
-	ErrDatabase   = Errno{Code: 20002, Message: "Database error."}
-	ErrEncryption = Errno{Code: 20003, Message: "encryption error."}
-	ErrLoadPolicy = Errno{Code: 20004, Message: "load policy error."}
+	ErrValidation     = Errno{Code: 20001, Message: "Validation failed."}
+	ErrDatabase       = Errno{Code: 20002, Message: "Database error."}
+	ErrEncryption     = Errno{Code: 20003, Message: "encryption error."}
+	ErrLoadPolicy     = Errno{Code: 20004, Message: "load policy error."}
+	ErrorUploadFile   = Errno{Code: 20005, Message: "upload file error."}
+	ErrorDownloadFile = Errno{Code: 20006, Message: "download file error."}
 
 	/*
 		person errors
@@ -38,4 +40,6 @@ var (
 	ErrUserExistedInRole      = Errno{Code: 20109, Message: "The user already exists in the role."}
 	ErrRelationshipNotExisted = Errno{Code: 20110, Message: "The relationship does not exist."}
 	ErrRemovePermission       = Errno{Code: 20111, Message: "Remove Permission failed."}
+	ErrUpdateUserAvatar       = Errno{Code: 20112, Message: "Update User Avatar failed."}
+	ErrDeleteFile             = Errno{Code: 20113, Message: "Delete File failed."}
 )

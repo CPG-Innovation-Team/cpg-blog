@@ -52,6 +52,7 @@ type RegisterQO struct {
 		状态
 	*/
 	State int `json:"state"`
+
 	/*
 		是否为超级用户
 	*/

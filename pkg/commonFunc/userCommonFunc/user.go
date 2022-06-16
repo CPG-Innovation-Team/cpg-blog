@@ -15,11 +15,14 @@ import (
 type IUser interface {
 	// FindUser 服务间查询用户信息
 	FindUser(ctx *gin.Context, uidList []int, name string, email string) (users map[uint]model.User)
+
+	//UpdateUserAvatar 更新用户头像
+	UpdateUserAvatar(ctx *gin.Context, uid int, avatar string) (err error)
 }
 
-type UserCommonFunc struct {}
+type UserCommonFunc struct{}
 
-func (c UserCommonFunc) Get() *UserCommonFunc{
+func (c UserCommonFunc) Get() *UserCommonFunc {
 	return new(UserCommonFunc)
 }
 
@@ -35,4 +38,13 @@ func (c UserCommonFunc) FindUser(ctx *gin.Context, uidList []int, name string, e
 		users[v.UID] = v
 	}
 	return users
+}
+
+func (c UserCommonFunc) UpdateUserAvatar(ctx *gin.Context, uid int, avatar string) (err error) {
+	updateQO := &model.User{
+		UID:    uint(uid),
+		Avatar: avatar,
+	}
+
+	return dao.UserDAO{}.UpdateUserAvatar(ctx, updateQO)
 }

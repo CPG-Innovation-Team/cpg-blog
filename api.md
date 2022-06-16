@@ -159,7 +159,7 @@
 ```
 	uri:/admin/article/delete
     query:
-        {"sn": 12334}
+        {"sn": "12334"}
     response:
         {
             "code":"code",
@@ -191,6 +191,32 @@
 # 查询文章详情
 ```
 	uri:/admin/article/info
+    query:
+        {
+            "sn":123
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":   
+                {
+                    "sn":"12323"
+                    "title": "hello",
+                    "author":"chen",
+                    "cover": "ddddd",
+                    "content": "this is content",
+                    "tags": "ffff",
+                    "state":0,
+                    "createdAt":1232312,
+                    "updatedAt":232323 
+                }
+        }
+```
+
+# 未登录查询文章详情
+```
+	uri:/article/info
     query:
         {
             "sn":123
@@ -275,6 +301,98 @@
             "Total": 15,    //总条数
             "TotalPage": 2  //总页数
                 }             
+        }
+```
+
+# 未登录查询文章列表
+```
+	uri:/article/list
+    query:
+        {
+            "isAllMyselfArticles":true,   //默认false,根据条件搜索所有的文章，否则查询自身所有文章
+            "article":                //以下条件根据页面提供的搜索条件进行组合查询
+            {
+                    "aid":123,  //精确查询
+                    "sn":12323  //精确查询
+                    "title": "hello",
+                    "uid":122,  //精确查询
+                    "tags": "ffff", //tag之间使用逗号隔开
+                    "state":1,  //必传参数，精确查询，默认查询未上线文章 文章状态 0-未审核;1-已上线;2-下线;3-用户删除'
+                    "viewNum":true, //默认false，根据浏览量倒序查询
+                    "cmtNum":true,  //默认false，根据评论量倒序查询
+                    "zanNum":true   //默认false，根据点赞数倒序查询
+            }
+            "page":
+            {
+                    "pageNum":1,
+                    "pageSize":10
+            }
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":
+                {
+                "articleDetailList":
+                    [{
+                    "sn":12323
+                    "title": "hello",
+                    "uid":122,
+                    "author":"chen",
+                    "cover": "ddddd",
+                    "content": "this is content",
+                    "tags": "ffff",
+                    "state":0,
+                    "viewNum":22,
+                    "cmtNum":1,
+                    "zanNum":22 
+                },{
+                    "sn":12323
+                    "title": "hello",
+                    "uid":122,
+                    "author":"chen",
+                    "cover": "ddddd",
+                    "content": "this is content",
+                    "tags": "ffff",
+                    "state":0,
+                    "viewNum":1,
+                    "cmtNum":1,
+                    "zanNum":2 
+                }],
+            "PageNum": 1,
+            "PageSize": 10,
+            "Total": 15,    //总条数
+            "TotalPage": 2  //总页数
+                }             
+        }
+```
+
+# 查询最受欢迎的文章
+```
+	uri:/article/popular/list
+    query:
+        {
+            "view_num": false,
+            "cmt_num": false,
+            "zan_num": true
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":   
+                {
+                    "sn":"12323"
+                    "title": "hello",
+                    "author":"chen",
+                    "cover": "ddddd",
+                    "content": "this is content",
+                    "tags": "ffff",
+                    "state":0,
+                    "createdAt":1232312,
+                    "updatedAt":232323 
+                }
         }
 ```
 
@@ -364,7 +482,23 @@
     query:
         {
         "rName": "角色名",
-        "pName": "权限名"
+        "pName": ["添加文章", "删除文章"]
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 角色删除权限
+```
+	uri:/admin/auth/role/remove/permission
+    query:
+        {
+        "rName": "角色名",
+        "pName": ["添加文章", "删除文章"]
         }
     response:
         {
@@ -411,7 +545,54 @@
 	uri:/admin/auth/delete/role
     query:
         {
-        "rName": "角色名"
+        "rName": ["角色名"]
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 查询用户所有角色
+```
+	uri:/admin/auth/query/user/roles
+    query:
+        {
+        "uid": [1,2,3]
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 用户添加多个角色
+```
+	uri:/admin/auth/user/add/roles
+    query:
+        {
+            "uid": 1,
+            "rName":["测试角色", "普通用"]
+        }
+    response:
+        {
+            "code":"code",
+            "message": "message",
+            "data":{}
+        }
+```
+
+# 用户删除多个角色
+```
+	uri:/admin/auth/user/delete/roles
+    query:
+        {
+            "uid": 1,
+            "rName":["测试角色", "普通用"]
         }
     response:
         {
@@ -458,7 +639,7 @@
 	uri:/admin/comment/add
     query: //必填
         {
-            "sn":1967400744308736,
+            "sn":"1967400744308736",
             "content":""
         }
     response:
@@ -524,7 +705,7 @@
 	uri:/comment/list
     query: //必填
         {
-            "sn":111
+            "sn":"111"
         }
     response:
         {
@@ -682,7 +863,7 @@
 	uri:/admin/review/comment
     query:
         {
-            "commentId": 1,
+            "commentId": [1, 2],
             "state": false
         }
     response:
@@ -744,7 +925,7 @@
 	uri:/admin/review/reply
     query:
         {
-            "commentId": 1,
+            "commentId": [1, 2],
             "state": false
         }
     response:
@@ -782,7 +963,7 @@
 	uri:/admin/notify/update
     query:
         {
-        "id": 5
+        "id": 5,
         "type": 4,
         "content": "test",
         "uid":[],

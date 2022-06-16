@@ -91,3 +91,20 @@ func (u UserDAO) UpdateUserInfo(ctx *gin.Context, param *model.User) (err error)
 	}(tx)
 	return err
 }
+
+//UpdateUserAvatar 更新用户头像
+func (u UserDAO) UpdateUserAvatar(ctx *gin.Context, param *model.User) (err error) {
+	tx := globalInit.Transaction()
+	err = func(db *gorm.DB) error {
+		if tx.Error != nil {
+			return tx.Error
+		}
+		tx.Model(param).Select("avatar").Updates(&param)
+		if tx.Error != nil {
+			tx.Rollback()
+			return tx.Error
+		}
+		return tx.Commit().Error
+	}(tx)
+	return err
+}

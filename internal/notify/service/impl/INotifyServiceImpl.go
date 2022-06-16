@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"log"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -29,7 +31,7 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 	util.JsonConvert(ctx, query)
 
 	//判断通知类型，若类型为4则uid默认为0;其余情况需将UID转换进行校验
-	if query.Type == cpgConst.FOUR && len(query.Uid) > 1 {
+	if query.Type == cpgConst.FOUR && len(query.Uid) > cpgConst.ONE {
 		common.SendResponse(ctx, common.ErrParam, "")
 		return
 	} else if query.Type == cpgConst.FOUR {
@@ -42,8 +44,25 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 	endTimeInt, _ := strconv.ParseInt(query.EndTime, 10, 64)
 	begin := time.Unix(beginTimeInt, 0)
 	end := time.Unix(endTimeInt, 0)
+
+
+	//校验参数
 	if end.Before(begin) || end.Before(nowTime) {
 		common.SendResponse(ctx, common.ErrParam, "")
+		return
+	}
+
+	//校验参数时间段内是否存在通知
+	notifyList, err := dao.Notify{}.GetNotifyList(begin,end)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	if len(notifyList) > cpgConst.ZERO {
+		e := common.ErrParam
+		e.Message = "该时间段内已存在通知!"
+		common.SendResponse(ctx, e, "")
 		return
 	}
 
@@ -60,7 +79,7 @@ func (Notify) AddNotification(ctx *gin.Context, query *qo.AddNotificationQO) {
 	notifyDao.EndTime = end
 
 	//model写入数据库
-	id, err := notifyDao.Creat(ctx)
+	id, err := notifyDao.Creat()
 
 	if err != nil {
 		common.SendResponse(ctx, err, "")
@@ -99,6 +118,20 @@ func (Notify) UpdateNotification(ctx *gin.Context, query *qo.UpdateNotificationQ
 		return
 	}
 
+	//校验参数时间段内是否存在通知
+	notifyList, err := dao.Notify{}.GetNotifyList(begin,end)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	if len(notifyList) > cpgConst.ZERO {
+		e := common.ErrParam
+		e.Message = "该时间段内已存在通知!"
+		common.SendResponse(ctx, e, "")
+		return
+	}
+
 	//将uid列表、content、state、beginTime、endTime写入model
 	uidByte, _ := json.Marshal(query.Uid)
 	content, _ := json.Marshal(query.Content)
@@ -111,7 +144,7 @@ func (Notify) UpdateNotification(ctx *gin.Context, query *qo.UpdateNotificationQ
 	notifyDao.EndTime = end
 
 	//更新
-	err := notifyDao.Update(ctx)
+	err = notifyDao.Update(ctx)
 
 	if err != nil {
 		common.SendResponse(ctx, err, "")
@@ -134,6 +167,15 @@ func (Notify) SystemNotify(ctx *gin.Context) {
 		common.SendResponse(ctx, err, "")
 		return
 	}
+
+	//如果存在多条，则返回离当前时间最近的一条通知
+	if len(result.NotificationList) > cpgConst.ONE {
+		sort.Sort(result)
+		log.Println("所有符合条件的通知：", result.NotificationList)
+		common.SendResponse(ctx, common.OK, vo.SystemNotificationVO{NotificationList: result.NotificationList[:cpgConst.ONE]})
+		return
+	}
+
 	common.SendResponse(ctx, common.OK, result)
 	return
 }

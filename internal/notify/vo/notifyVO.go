@@ -16,3 +16,15 @@ type AddNotificationVO struct {
 type SystemNotificationVO struct {
 	NotificationList []model.Notify
 }
+
+func (s SystemNotificationVO) Len() int{
+	return len(s.NotificationList)
+}
+
+func (s SystemNotificationVO) Less(i, j int) bool{
+	return s.NotificationList[i].EndTime.Unix() < s.NotificationList[j].EndTime.Unix()
+}
+
+func (s SystemNotificationVO) Swap(i, j int) {
+	s.NotificationList[i], s.NotificationList[j] = s.NotificationList[j], s.NotificationList[i]
+}
