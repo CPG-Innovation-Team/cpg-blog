@@ -1,5 +1,0 @@
-[GIN] 2022/04/15 - 20:31:13 | 200 |   26.199917ms |             ::1 | POST     "/admin/auth/user/add/roles"
-[GIN] 2022/04/15 - 20:31:26 | 200 |  148.495333ms |             ::1 | POST     "/login"
-[GIN] 2022/04/15 - 20:31:43 | 200 |  621.752042ms |             ::1 | POST     "/admin/auth/user/add/roles"
-[GIN] 2022/04/15 - 20:33:18 | 200 |  224.377792ms |             ::1 | POST     "/admin/auth/user/delete/roles"
-[GIN] 2022/04/15 - 20:34:58 | 200 |  458.213292ms |             ::1 | POST     "/admin/review/comment"

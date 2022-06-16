@@ -2,10 +2,12 @@ package dao
 
 import (
 	"cpg-blog/global/common"
+	"cpg-blog/global/cpgConst"
 	"cpg-blog/global/globalInit"
 	"cpg-blog/internal/notify/model"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"time"
 )
 
 /**
@@ -32,7 +34,14 @@ func (n Notify) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (n Notify) Creat(ctx *gin.Context) (id int, err error) {
+func (n Notify) GetNotifyList(begin, end time.Time) (notify []model.Notify, err error) {
+	db := globalInit.Db
+	err = db.Where("not(begin_time > ? or end_time < ?) and state = ?", end, begin, cpgConst.ONE).Find(&notify).Error
+	return
+}
+
+
+func (n Notify) Creat() (id int, err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase

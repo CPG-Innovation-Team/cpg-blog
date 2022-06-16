@@ -37,14 +37,14 @@ func (u Controller) RegisterRoute(g *gin.RouterGroup) {
 	// AddUserIntoGroup 添加用户-用户组关联
 	authGroup.POST("/role/add/user", auth.AddUserIntoRole)
 
+	//用户移除角色
+	authGroup.POST("/role/remove/user", auth.RoleRemoveUser)
+
 	//删除角色，且解除角色与权限关联
 	authGroup.POST("/delete/role", auth.DeleteRole)
 
 	//查询用户所有角色
 	authGroup.POST("/query/user/roles", auth.GetUserRoles)
-
-	//用户移除角色
-	authGroup.POST("/role/remove/user", auth.RoleRemoveUser)
 
 	//用户批量添加角色
 	authGroup.POST("/user/add/roles", auth.UserAddRolesInBatches)
