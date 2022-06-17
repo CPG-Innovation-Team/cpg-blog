@@ -258,7 +258,7 @@ func getKeyFromLink(link string) (key string) {
 }
 
 func (op ObjectProcessing) UpdateAvatar(ctx *gin.Context) {
-	query := new(qo.UploadImgQO)
+	query := new(qo.UpdateImgQO)
 	util.JsonConvert(ctx, query)
 
 	//根据头像link拿到key
@@ -288,11 +288,11 @@ func (op ObjectProcessing) UpdateAvatar(ctx *gin.Context) {
 }
 
 func (op ObjectProcessing) Update(ctx *gin.Context) {
-	query := new(qo.UploadImgQO)
+	query := new(qo.UpdateQO)
 	util.JsonConvert(ctx, query)
 
 	//根据link拿到key
-	key := getKeyFromLink(query.ImgLink)
+	key := getKeyFromLink(query.Link)
 
 	//根据key删除文件
 	err := deleteFile(key)

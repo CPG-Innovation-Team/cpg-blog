@@ -10,10 +10,14 @@ type DownloadImgQO struct {
 	FileName string
 }
 
-type UploadImgQO struct {
-	ImgLink string
+type UpdateImgQO struct {
+	ImgLink string `binding:"required"`
+}
+
+type UpdateQO struct {
+	Link string `binding:"required"`
 }
 
 type DeleteQO struct {
-	Link string
+	Link string `binding:"required"`
 }

@@ -13,7 +13,7 @@ import (
 
 type Controller struct{}
 
-var processor = impl.ObjectProcessing{}
+var processor = &impl.ObjectProcessing{}
 
 func (c Controller) RegisterRoute(g *gin.RouterGroup) {
 	//query := g.Group("/object/query")
