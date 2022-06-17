@@ -1,0 +1,2 @@
+[GIN] 2022/06/17 - 10:26:35 | 200 |  1.461045167s |             ::1 | POST     "/admin/object/upload/avatar"
+[GIN] 2022/06/17 - 10:37:04 | 200 |    1.2340395s |             ::1 | POST     "/admin/object/upload/avatar"
