@@ -5,6 +5,7 @@ import (
 	"cpg-blog/global/cpgConst"
 	"cpg-blog/internal/object-processing/model/dao"
 	"cpg-blog/internal/object-processing/qo"
+	"cpg-blog/internal/object-processing/vo"
 	"cpg-blog/middleware/jwt"
 	"cpg-blog/pkg/awsS3"
 	"cpg-blog/pkg/commonFunc/userCommonFunc"
@@ -197,7 +198,7 @@ func (op ObjectProcessing) UploadAvatar(ctx *gin.Context) {
 		return
 	}
 
-	common.SendResponse(ctx, common.OK, "上传成功!")
+	common.SendResponse(ctx, common.OK, vo.ObjectVO{Url: url})
 	return
 }
 
@@ -217,7 +218,7 @@ func (op ObjectProcessing) Upload(ctx *gin.Context) {
 		return
 	}
 
-	common.SendResponse(ctx, common.OK, "上传成功!")
+	common.SendResponse(ctx, common.OK, vo.ObjectVO{Url: url})
 	return
 }
 

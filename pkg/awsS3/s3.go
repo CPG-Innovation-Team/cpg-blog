@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,16 +23,11 @@ import (
 **/
 
 var (
-	//accessKey = "AKIA4M64NSML7PCXSFW2"
-	accessKey = "AKIAWKWRSYPCWNNLDY4Q"
-	//secretKey = "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"
-	secretKey = "j7jeYeveUVPHSnPt5iy4dT4IiCeTrLCxIGwMWZ6i"
-	//bucket    = "cpg-blog-img"
-	bucket = "cpg-blog"
-	//region    = "ap-northeast-2"
-	region = "us-west-1"
-	//endpoint = "https://s3.ap-northeast-2.amazonaws.com"
-	endpoint = "https://s3.us-west-1.amazonaws.com"
+	accessKey = viper.GetString("s3.accessKey")
+	secretKey = viper.GetString("s3.secretKey")
+	bucket    = viper.GetString("s3.bucket")
+	region    = viper.GetString("s3.region")
+	endpoint  = viper.GetString("s3.endpoint")
 
 	PartSize = 5 * 1024 * 1024
 	Retries  = 2
