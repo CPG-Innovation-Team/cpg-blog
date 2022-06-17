@@ -102,7 +102,7 @@ func upload(ctx *gin.Context) (url string, err error) {
 	}
 
 	//获取URL
-	url = awsS3.GetObjectUrl(key, ext, path.Ext(filename))
+	url = awsS3.GetObjectUrl(key, ext)
 
 	//更新数据库
 	fileDao := new(dao.File)
