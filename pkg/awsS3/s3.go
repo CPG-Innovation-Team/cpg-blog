@@ -39,9 +39,9 @@ var (
 
 //GetObjectUrl 获取对象URL
 
-func GetObjectUrl(key, fileType, ext string) (objectUrl string) {
+func GetObjectUrl(key, fileType string) (objectUrl string) {
 	//objectUrl = fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s/%s%s", bucket, region, fileType, key, ext)
-	objectUrl = fmt.Sprintf("https://blog-static.cpgroup.top/%s/%s%s", fileType, key, ext)
+	objectUrl = fmt.Sprintf("https://blog-static.cpgroup.top/%s/%s", fileType, key)
 	return
 }
 
