@@ -66,3 +66,16 @@ subject = "cpg-blog-token"
 [defaultRole]
 # 注册普通用户时默认添加角色名
 ordinaryUser = "普通用户"
+
+# s3配置
+[s3]
+# 密钥
+accessKey = "AKIAWKWRSYPCWNNLDY4Q"
+#私钥
+secretKey = "j7jeYeveUVPHSnPt5iy4dT4IiCeTrLCxIGwMWZ6i"
+#bucket
+bucket = "cpg-blog"
+#region
+region = "us-west-1"
+#endpoint
+endpoint = "https://s3.us-west-1.amazonaws.com"
