@@ -78,6 +78,7 @@ func upload(ctx *gin.Context) (url string, err error) {
 	//生成key(fileType/uid+timeString+filename)
 	timeString := time.Now().Format("20060102150405")
 	key := fmt.Sprintf("%s/%d%s%s", ext, uid, timeString, filename)
+	storageKey := fmt.Sprintf("%d%s%s", uid, timeString, filename)
 
 	f, _ := file.Open()
 	buf := make([]byte, file.Size)
@@ -122,7 +123,7 @@ func upload(ctx *gin.Context) (url string, err error) {
 	}
 
 	fileDao = &dao.File{
-		Name:    key,
+		Name:    storageKey,
 		Uid:     uid,
 		Address: url,
 		Type:    ft,
