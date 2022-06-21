@@ -52,7 +52,7 @@ func (fd File) Update() (err error) {
 	tx := globalInit.Transaction()
 	err = func(db *gorm.DB) error {
 		e := common.ErrDatabase
-		tx.Updates(&fd).Commit()
+		tx.Model(&fd).Where("name = ?", fd.Name).Update("state", fd.State).Commit()
 		if tx.Error != nil {
 			tx.Rollback()
 			e.Message = tx.Error.Error()

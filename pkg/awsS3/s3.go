@@ -178,6 +178,7 @@ func MultipartUpload(key string, buf []byte) error {
 	// Create MultipartUpload object
 	expiryDate := time.Now().AddDate(0, 0, 1)
 	createdResp, err := svc.CreateMultipartUpload(&s3.CreateMultipartUploadInput{
+		ACL:     aws.String(s3.ObjectCannedACLPublicRead),
 		Bucket:  aws.String(bucket),
 		Key:     aws.String(key),
 		Expires: &expiryDate,
