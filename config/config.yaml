@@ -1,0 +1,54 @@
+domain: tofore.com.cn：88080
+name: cpg-blog
+env: dev
+desc:
+  keywords: blog
+  desc: balabala
+storage:
+  driver: mysql
+  user: cpg
+  password: arxWijx3Z7KCpxWb
+  host: 81.68.251.252
+  port: 3306
+  dbname: cpg
+  charset: utf8mb4
+  max_idle: 2
+  max_conn: 10
+  prefix: cpg_blog_
+redis:
+  host: 81.68.251.252
+  password: chenXI951026.
+  port: 6379
+http:
+  host: ""
+  port: :8080
+uuid:
+  start_time: 2021-09-18 00:00:00 +0000
+  base: 32
+log:
+  isStdout: true
+gormLog:
+  slowThreshold: 2
+  logLevel: 4
+token:
+  signKey: xichen.ethan
+  expires: 1
+  issuer: CPG
+  subject: cpg-blog-token
+defaultRole:
+  ordinaryUser: 普通用户
+
+
+nacos:
+  host: "81.68.251.252"
+  port: 8848
+
+  user: "ethan"
+  password: "chenXI951026."
+
+  nameSpaceId: "e6a595b7-bf50-4811-908e-197cb78bb959"
+  dataId: "cpg-blog-01"
+  group: "cpg-blog"
+  timeout: 5000
+  logDir: "/tmp/nacos/log"
+  cacheDir: "/tmp/nacos/cache"
