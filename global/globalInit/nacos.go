@@ -258,6 +258,7 @@ func (provider *ViperRemoteProvider) GetProvider(runtimeViper *viper.Viper) *vip
 	if provider.configType == "" {
 		provider.configType = "yaml"
 	}
+
 	remoteViper.SetConfigType(provider.configType)
 	err = remoteViper.ReadRemoteConfig()
 	if err == nil {
