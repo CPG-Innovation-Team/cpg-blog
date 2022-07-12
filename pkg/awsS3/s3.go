@@ -123,7 +123,6 @@ func getBucketFileContent(bucket string, key string) []byte {
 
 //UploadFile 上传文件
 func UploadFile(key string, file []byte) error {
-	fmt.Println("key:::::::", accessKey, secretKey)
 	_, err := s3manager.NewUploader(getSession()).Upload(&s3manager.UploadInput{
 		ACL:    aws.String(s3.ObjectCannedACLPublicRead),
 		Bucket: aws.String(bucket),
