@@ -47,6 +47,7 @@ func ViperInit() {
 		if err := viper.ReadInConfig(); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
+
 		NacosInit()
 
 		//监控配置文件
