@@ -293,7 +293,7 @@ func (provider *ViperRemoteProvider) WatchRemoteConfigOnChannel(remoteViper *vip
 func NacosInit() {
 
 	SetOptions(&Option{
-		Hosts:       viper.GetString("nacos.host"),
+		Hosts:       viper.GetString("nacos.localhost"),
 		Port:        viper.GetUint64("nacos.port"),
 		NamespaceId: viper.GetString("nacos.nameSpaceId"),
 		GroupName:   viper.GetString("nacos.group"),
