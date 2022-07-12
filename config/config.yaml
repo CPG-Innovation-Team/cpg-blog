@@ -41,6 +41,7 @@ defaultRole:
 
 nacos:
   host: "81.68.251.252"
+  localhost: "81.68.251.252"
   port: 8848
 
   user: "ethan"
