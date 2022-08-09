@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"path"
 	"regexp"
@@ -35,8 +37,8 @@ func tokenInfo(ctx *gin.Context) (Info *jwt.CustomClaims, err error) {
 	return
 }
 
-//通过正则表达式判断属于file、image、video、other
-func fileType(ext string) string {
+//通过正则表达式判断文件后缀属于file、image、video、other
+func fileTypeSuffix(ext string) string {
 	regImg := regexp.MustCompile("^\\.(jpg|jpeg|png|gif|bmp|svg|webp)$")
 	regVideo := regexp.MustCompile("^\\.(mp4|avi|flv|mkv|mov|mpg|mpeg|rm|rmvb|wmv|3gp|3g2)$")
 	regFile := regexp.MustCompile("^\\.(doc|docx|xls|xlsx|ppt|pptx|pdf|txt|wps|et|dps|odt|ods|odp|pot|potx|pps|ppsx|sld|sldx|xlsb|xlsm|xlsx|xltm|xltx|xlam|xls)$")
@@ -50,6 +52,36 @@ func fileType(ext string) string {
 	} else {
 		return "other"
 	}
+}
+
+// 根据前缀判断并修改文件类型
+func fileTypeByPrefix(file *multipart.FileHeader) {
+	f, _ := file.Open()
+	buf := make([]byte, file.Size)
+	_, _ = f.Read(buf)
+	ct := http.DetectContentType(buf)
+
+	if ct == "application/octet-stream" {
+		return
+	}
+
+	s := strings.Split(ct, "/")
+	ext1 := "." + s[1]
+	ext2 := path.Ext(file.Filename)
+
+	if ext2 == "" {
+		builder := strings.Builder{}
+		builder.WriteString(file.Filename)
+		builder.WriteString(ext1)
+		file.Filename = builder.String()
+		return
+	}
+
+	if ext1 != ext2 {
+		strings.Replace(file.Filename, ext2, ext1, 1)
+		return
+	}
+
 }
 
 func getUid(ctx *gin.Context) (uid int, err error) {
@@ -66,14 +98,22 @@ func getUid(ctx *gin.Context) (uid int, err error) {
 func upload(ctx *gin.Context) (url string, err error) {
 	file, err := ctx.FormFile("file")
 
+	if file == nil {
+		common.SendResponse(ctx, common.ErrParam, "file不能为空")
+		return
+	}
+
 	//获取uid
 	uid, err := getUid(ctx)
+
+	//根据文件前缀处理文件后缀
+	fileTypeByPrefix(file)
 
 	// 获取文件名
 	filename := file.Filename
 
-	//获取文件类型
-	ext := fileType(path.Ext(filename))
+	//通过后缀获取文件类型
+	ext := fileTypeSuffix(path.Ext(filename))
 
 	//生成key(fileType/uid+timeString+filename)
 	timeString := time.Now().Format("20060102150405")
